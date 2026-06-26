@@ -22,11 +22,11 @@
 
 #include "state-tracking.h"
 
-#include <nvrhi/utils.h>
+#include <cutie/utils.h>
 
 #include <sstream>
 
-namespace nvrhi
+namespace cutie
 {
     bool verifyPermanentResourceState(ResourceStates permanentState, ResourceStates requiredState, bool isTexture, const std::string& debugName, IMessageCallback* messageCallback)
     {
@@ -463,4 +463,4 @@ namespace nvrhi
             : ResourceStates::NonPixelShaderResource;
     }
 
-} // namespace nvrhi
+} // namespace cutie

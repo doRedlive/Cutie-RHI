@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include <nvrhi/nvrhi.h>
+#include <cutie/cutie.h>
 #include <dxgi.h>
 
-namespace nvrhi
+namespace cutie
 {
     struct DxgiFormatMapping
     {

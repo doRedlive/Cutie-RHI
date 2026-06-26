@@ -22,10 +22,10 @@
 
 #include "d3d12-backend.h"
 
-#include <nvrhi/common/misc.h>
+#include <cutie/common/misc.h>
 #include <sstream>
 
-namespace nvrhi::d3d12
+namespace cutie::d3d12
 {
     void CommandList::setResourceStatesForBindingSet(IBindingSet* _bindingSet)
     {
@@ -179,7 +179,7 @@ namespace nvrhi::d3d12
                 d3dbarrier.AccessBefore = stateBefore.access;
                 d3dbarrier.AccessAfter = stateAfter.access;
                 d3dbarrier.pResource = buffer->resource;
-                d3dbarrier.Size = buffer->desc.byteSize; // NVRHI doesn't support partial buffer barriers
+                d3dbarrier.Size = buffer->desc.byteSize; // CUTIE doesn't support partial buffer barriers
                 m_D3DBufferBarriers.push_back(d3dbarrier);
             }
 
@@ -396,4 +396,4 @@ namespace nvrhi::d3d12
         return m_StateTracker.getBufferState(buffer);
     }
     
-} // namespace nvrhi::d3d12
+} // namespace cutie::d3d12

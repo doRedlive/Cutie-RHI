@@ -22,10 +22,10 @@
 
 #include "d3d12-backend.h"
 
-#include <nvrhi/common/misc.h>
+#include <cutie/common/misc.h>
 #include <sstream>
 
-namespace nvrhi::d3d12
+namespace cutie::d3d12
 {
     Object ComputePipeline::getNativeObject(ObjectType objectType)
     {
@@ -51,7 +51,7 @@ namespace nvrhi::d3d12
         Shader* shader = checked_cast<Shader*>(state.CS.Get());
         desc.CS = { &shader->bytecode[0], shader->bytecode.size() };
 
-#if NVRHI_D3D12_WITH_NVAPI
+#if CUTIE_D3D12_WITH_NVAPI
         if (!shader->extensions.empty())
         {
             NvAPI_Status status = NvAPI_D3D12_CreateComputePipelineState(m_Context.device, &desc, 
@@ -180,4 +180,4 @@ namespace nvrhi::d3d12
         m_ActiveCommandList->commandList->ExecuteIndirect(m_Context.dispatchIndirectSignature, 1, indirectParams->resource, offsetBytes, nullptr, 0);
     }
 
-} // namespace nvrhi::d3d12
+} // namespace cutie::d3d12

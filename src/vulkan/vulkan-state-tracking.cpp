@@ -21,9 +21,9 @@
 */
 
 #include "vulkan-backend.h"
-#include <nvrhi/common/misc.h>
+#include <cutie/common/misc.h>
 
-namespace nvrhi::vulkan
+namespace cutie::vulkan
 {
     
     void CommandList::setResourceStatesForBindingSet(IBindingSet* _bindingSet)
@@ -404,4 +404,4 @@ namespace nvrhi::vulkan
         m_StateTracker.setEnableUavBarriersForBuffer(buffer, enableBarriers);
     }
 
-} // namespace nvrhi::vulkan
+} // namespace cutie::vulkan

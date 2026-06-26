@@ -21,9 +21,9 @@
 */
 
 #include "vulkan-backend.h"
-#include "nvrhi/common/misc.h"
+#include "cutie/common/misc.h"
 
-namespace nvrhi::vulkan
+namespace cutie::vulkan
 {
     extern vk::ImageAspectFlags guessImageAspectFlags(vk::Format format);
 
@@ -353,7 +353,7 @@ namespace nvrhi::vulkan
                 cmd->submissionID = 0;
                 releasedCmdBufs.push_back(cmd);
 
-#ifdef NVRHI_WITH_RTXMU
+#ifdef CUTIE_WITH_RTXMU
                 if (!cmd->rtxmuBuildIds.empty())
                 {
                     std::lock_guard lockGuard(m_Context.rtxMuResources->asListMutex);
@@ -458,4 +458,4 @@ namespace nvrhi::vulkan
 
         return (result == vk::Result::eSuccess);
     }
-} // namespace nvrhi::vulkan
+} // namespace cutie::vulkan

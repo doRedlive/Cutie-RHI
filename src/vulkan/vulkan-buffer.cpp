@@ -23,9 +23,9 @@
 #include "vulkan-backend.h"
 #include <sstream>
 
-#include <nvrhi/common/misc.h>
+#include <cutie/common/misc.h>
 
-namespace nvrhi::vulkan
+namespace cutie::vulkan
 {
 
     BufferHandle Device::createBuffer(const BufferDesc& desc)
@@ -671,4 +671,4 @@ namespace nvrhi::vulkan
         return true;
     }
 
-} // namespace nvrhi::vulkan
+} // namespace cutie::vulkan

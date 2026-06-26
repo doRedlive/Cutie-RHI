@@ -22,12 +22,12 @@
 
 #include "d3d11-backend.h"
 
-#include <nvrhi/utils.h>
-#include <nvrhi/common/misc.h>
+#include <cutie/utils.h>
+#include <cutie/common/misc.h>
 #include <sstream>
 #include <iomanip>
 
-namespace nvrhi::d3d11
+namespace cutie::d3d11
 {
 
     Object Texture::getNativeObject(ObjectType objectType)
@@ -242,7 +242,7 @@ namespace nvrhi::d3d11
         return false;
     }
     
-    nvrhi::TextureHandle Device::createHandleForNativeTexture(ObjectType objectType, Object _texture, const TextureDesc& desc)
+    cutie::TextureHandle Device::createHandleForNativeTexture(ObjectType objectType, Object _texture, const TextureDesc& desc)
     {
         if (!_texture.pointer)
             return nullptr;
@@ -409,7 +409,7 @@ namespace nvrhi::d3d11
         utils::NotSupported();
     }
 
-    void CommandList::decodeSamplerFeedbackTexture(IBuffer* buffer, ISamplerFeedbackTexture* texture, nvrhi::Format format)
+    void CommandList::decodeSamplerFeedbackTexture(IBuffer* buffer, ISamplerFeedbackTexture* texture, cutie::Format format)
     {
         (void)buffer;
         (void)texture;
@@ -899,4 +899,4 @@ namespace nvrhi::d3d11
     }
 
 
-} // nanmespace nvrhi::d3d11
+} // nanmespace cutie::d3d11

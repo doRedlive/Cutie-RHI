@@ -23,48 +23,48 @@
 #pragma once
 
 #include <mutex>
-#include <nvrhi/nvrhi.h>
+#include <cutie/cutie.h>
 
-namespace nvrhi::utils
+namespace cutie::utils
 {
-    NVRHI_API BlendState::RenderTarget CreateAddBlendState(
+    CUTIE_API BlendState::RenderTarget CreateAddBlendState(
         BlendFactor srcBlend,
         BlendFactor dstBlend);
 
 
-    NVRHI_API BufferDesc CreateStaticConstantBufferDesc(
+    CUTIE_API BufferDesc CreateStaticConstantBufferDesc(
         uint32_t byteSize,
         const char* debugName);
 
-    NVRHI_API BufferDesc CreateVolatileConstantBufferDesc(
+    CUTIE_API BufferDesc CreateVolatileConstantBufferDesc(
         uint32_t byteSize,
         const char* debugName,
         uint32_t maxVersions);
 
-    NVRHI_API bool CreateBindingSetAndLayout(
+    CUTIE_API bool CreateBindingSetAndLayout(
         IDevice* device, 
-        nvrhi::ShaderType visibility,
+        cutie::ShaderType visibility,
         uint32_t registerSpace,
         const BindingSetDesc& bindingSetDesc, 
         BindingLayoutHandle& bindingLayout, 
         BindingSetHandle& bindingSet,
         bool registerSpaceIsDescriptorSet = false);
 
-    NVRHI_API void ClearColorAttachment(
+    CUTIE_API void ClearColorAttachment(
         ICommandList* commandList,
         IFramebuffer* framebuffer,
         uint32_t attachmentIndex,
         Color color
     );
 
-    NVRHI_API void ClearDepthStencilAttachment(
+    CUTIE_API void ClearDepthStencilAttachment(
         ICommandList* commandList,
         IFramebuffer* framebuffer,
         float depth,
         uint32_t stencil
     );
 
-    NVRHI_API void BuildBottomLevelAccelStruct(
+    CUTIE_API void BuildBottomLevelAccelStruct(
         ICommandList* commandList,
         rt::IAccelStruct* as,
         const rt::AccelStructDesc& desc
@@ -73,33 +73,33 @@ namespace nvrhi::utils
     // Places a UAV barrier on the provided texture.
     // Useful when doing multiple consecutive dispatch calls with the same resources but different constants.
     // Ignored if there was a call to setEnableUavBarriersForTexrure(..., false) on this texture.
-    NVRHI_API void TextureUavBarrier(
+    CUTIE_API void TextureUavBarrier(
         ICommandList* commandList,
         ITexture* texture);
 
     // Places a UAV barrier on the provided buffer.
     // Useful when doing multiple consecutive dispatch calls with the same resources but different constants.
     // Ignored if there was a call to setEnableUavBarriersForBuffer(..., false) on this buffer.
-    NVRHI_API void BufferUavBarrier(
+    CUTIE_API void BufferUavBarrier(
         ICommandList* commandList,
         IBuffer* buffer);
 
     // Selects a format from the supplied list that supports all the required features on the given device.
     // The formats are tested in the same order they're provided, and the first matching one is returned.
     // If no formats are matching, Format::UNKNOWN is returned.
-    NVRHI_API Format ChooseFormat(
+    CUTIE_API Format ChooseFormat(
         IDevice* device,
-        nvrhi::FormatSupport requiredFeatures,
-        const nvrhi::Format* requestedFormats,
+        cutie::FormatSupport requiredFeatures,
+        const cutie::Format* requestedFormats,
         size_t requestedFormatCount);
     
-    NVRHI_API const char* GraphicsAPIToString(GraphicsAPI api);
-    NVRHI_API const char* TextureDimensionToString(TextureDimension dimension);
-    NVRHI_API const char* DebugNameToString(const std::string& debugName);
-    NVRHI_API const char* ShaderStageToString(ShaderType stage);
-    NVRHI_API const char* ResourceTypeToString(ResourceType type);
-    NVRHI_API const char* FormatToString(Format format);
-    NVRHI_API const char* CommandQueueToString(CommandQueue queue);
+    CUTIE_API const char* GraphicsAPIToString(GraphicsAPI api);
+    CUTIE_API const char* TextureDimensionToString(TextureDimension dimension);
+    CUTIE_API const char* DebugNameToString(const std::string& debugName);
+    CUTIE_API const char* ShaderStageToString(ShaderType stage);
+    CUTIE_API const char* ResourceTypeToString(ResourceType type);
+    CUTIE_API const char* FormatToString(Format format);
+    CUTIE_API const char* CommandQueueToString(CommandQueue queue);
 
     std::string GenerateHeapDebugName(const HeapDesc& desc);
     std::string GenerateTextureDebugName(const TextureDesc& desc);

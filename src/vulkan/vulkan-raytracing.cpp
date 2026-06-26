@@ -21,10 +21,10 @@
 */
 
 #include "vulkan-backend.h"
-#include <nvrhi/common/misc.h>
+#include <cutie/common/misc.h>
 #include <sstream>
 
-namespace nvrhi::vulkan
+namespace cutie::vulkan
 {
     static vk::DeviceOrHostAddressConstKHR getBufferAddress(IBuffer* _buffer, uint64_t offset)
     {
@@ -78,7 +78,7 @@ namespace nvrhi::vulkan
         UploadManager* uploadManager,
         uint64_t currentVersion)
     {
-        auto convertIndexFormatToType = [&context](const nvrhi::Format indexFormat, const bool supportUint8) {
+        auto convertIndexFormatToType = [&context](const cutie::Format indexFormat, const bool supportUint8) {
             switch (indexFormat)  // NOLINT(clang-diagnostic-switch-enum)
             {
             case Format::R8_UINT:
@@ -327,7 +327,7 @@ namespace nvrhi::vulkan
         as->desc = desc;
         as->allowUpdate = (desc.buildFlags & rt::AccelStructBuildFlags::AllowUpdate) != 0;
 
-#ifdef NVRHI_WITH_RTXMU
+#ifdef CUTIE_WITH_RTXMU
         bool isManaged = desc.isTopLevel;
 #else
         bool isManaged = true;
@@ -578,7 +578,7 @@ namespace nvrhi::vulkan
         // Get size info from Vulkan
         auto vkSizeInfo = m_Context.device.getClusterAccelerationStructureBuildSizesNV(inputInfo);
 
-        // Convert Vulkan size info to NVRHI size info
+        // Convert Vulkan size info to CUTIE size info
         info.resultMaxSizeInBytes = vkSizeInfo.accelerationStructureSize;
         info.scratchSizeInBytes = vkSizeInfo.buildScratchSize;
 
@@ -614,7 +614,7 @@ namespace nvrhi::vulkan
             requireBufferState(desc.inputBuffer, ResourceStates::OpacityMicromapBuildInput);
             requireBufferState(desc.perOmmDescs, ResourceStates::OpacityMicromapBuildInput);
 
-            requireBufferState(omm->dataBuffer, nvrhi::ResourceStates::OpacityMicromapWrite);
+            requireBufferState(omm->dataBuffer, cutie::ResourceStates::OpacityMicromapWrite);
             m_BindingStatesDirty = true;
         }
 
@@ -704,11 +704,11 @@ namespace nvrhi::vulkan
                 if (m_EnableAutomaticBarriers)
                 {
                     if (srct.indexBuffer)
-                        requireBufferState(srct.indexBuffer, nvrhi::ResourceStates::AccelStructBuildInput);
+                        requireBufferState(srct.indexBuffer, cutie::ResourceStates::AccelStructBuildInput);
                     if (srct.vertexBuffer)
-                        requireBufferState(srct.vertexBuffer, nvrhi::ResourceStates::AccelStructBuildInput);
+                        requireBufferState(srct.vertexBuffer, cutie::ResourceStates::AccelStructBuildInput);
                     if (OpacityMicromap* om = checked_cast<OpacityMicromap*>(srct.opacityMicromap))
-                        requireBufferState(om->dataBuffer, nvrhi::ResourceStates::AccelStructBuildInput);
+                        requireBufferState(om->dataBuffer, cutie::ResourceStates::AccelStructBuildInput);
                 }
                 break;
             }
@@ -717,7 +717,7 @@ namespace nvrhi::vulkan
                 if (m_EnableAutomaticBarriers)
                 {
                     if (srca.buffer)
-                        requireBufferState(srca.buffer, nvrhi::ResourceStates::AccelStructBuildInput);
+                        requireBufferState(srca.buffer, cutie::ResourceStates::AccelStructBuildInput);
                 }
                 break;
             }
@@ -729,9 +729,9 @@ namespace nvrhi::vulkan
                 if (m_EnableAutomaticBarriers)
                 {
                     if (srcLss.indexBuffer)
-                        requireBufferState(srcLss.indexBuffer, nvrhi::ResourceStates::AccelStructBuildInput);
+                        requireBufferState(srcLss.indexBuffer, cutie::ResourceStates::AccelStructBuildInput);
                     if (srcLss.vertexBuffer)
-                        requireBufferState(srcLss.vertexBuffer, nvrhi::ResourceStates::AccelStructBuildInput);
+                        requireBufferState(srcLss.vertexBuffer, cutie::ResourceStates::AccelStructBuildInput);
                 }
                 break;
             }
@@ -753,7 +753,7 @@ namespace nvrhi::vulkan
         if (performUpdate)
             buildInfo.setSrcAccelerationStructure(as->accelStruct);
         
-#ifdef NVRHI_WITH_RTXMU
+#ifdef CUTIE_WITH_RTXMU
         commitBarriers();
 
         std::array<vk::AccelerationStructureBuildGeometryInfoKHR, 1> buildInfos = { buildInfo };
@@ -794,7 +794,7 @@ namespace nvrhi::vulkan
 
         if (m_EnableAutomaticBarriers)
         {
-            requireBufferState(as->dataBuffer, nvrhi::ResourceStates::AccelStructWrite);
+            requireBufferState(as->dataBuffer, cutie::ResourceStates::AccelStructWrite);
         }
         commitBarriers();
 
@@ -846,7 +846,7 @@ namespace nvrhi::vulkan
 
     void CommandList::compactBottomLevelAccelStructs()
     {
-#ifdef NVRHI_WITH_RTXMU
+#ifdef CUTIE_WITH_RTXMU
 
         if (!m_Context.rtxMuResources->asBuildsCompleted.empty())
         {
@@ -982,7 +982,7 @@ namespace nvrhi::vulkan
             if (src.bottomLevelAS)
             {
                 AccelStruct* blas = checked_cast<AccelStruct*>(src.bottomLevelAS);
-#ifdef NVRHI_WITH_RTXMU
+#ifdef CUTIE_WITH_RTXMU
                 blas->rtxmuBuffer = m_Context.rtxMemUtil->GetBuffer(blas->rtxmuId);
                 blas->accelStruct = m_Context.rtxMemUtil->GetAccelerationStruct(blas->rtxmuId);
                 blas->accelStructDeviceAddress = m_Context.rtxMemUtil->GetDeviceAddress(blas->rtxmuId);
@@ -992,7 +992,7 @@ namespace nvrhi::vulkan
 
                 if (m_EnableAutomaticBarriers)
                 {
-                    requireBufferState(blas->dataBuffer, nvrhi::ResourceStates::AccelStructBuildBlas);
+                    requireBufferState(blas->dataBuffer, cutie::ResourceStates::AccelStructBuildBlas);
                 }
 #endif
             }
@@ -1008,7 +1008,7 @@ namespace nvrhi::vulkan
             memcpy(dst.transform.matrix.data(), src.transform, sizeof(float) * 12);
         }
 
-#ifdef NVRHI_WITH_RTXMU
+#ifdef CUTIE_WITH_RTXMU
         m_Context.rtxMemUtil->PopulateUAVBarriersCommandList(m_CurrentCmdBuf->cmdBuf, m_CurrentCmdBuf->rtxmuBuildIds);
 #endif
 
@@ -1028,7 +1028,7 @@ namespace nvrhi::vulkan
 
         if (m_EnableAutomaticBarriers)
         {
-            requireBufferState(as->dataBuffer, nvrhi::ResourceStates::AccelStructWrite);
+            requireBufferState(as->dataBuffer, cutie::ResourceStates::AccelStructWrite);
             m_BindingStatesDirty = true;
         }
         commitBarriers();
@@ -1039,7 +1039,7 @@ namespace nvrhi::vulkan
             m_CurrentCmdBuf->referencedResources.push_back(as);
     }
 
-    void CommandList::buildTopLevelAccelStructFromBuffer(rt::IAccelStruct* _as, nvrhi::IBuffer* _instanceBuffer, uint64_t instanceBufferOffset, size_t numInstances, rt::AccelStructBuildFlags buildFlags)
+    void CommandList::buildTopLevelAccelStructFromBuffer(rt::IAccelStruct* _as, cutie::IBuffer* _instanceBuffer, uint64_t instanceBufferOffset, size_t numInstances, rt::AccelStructBuildFlags buildFlags)
     {
         AccelStruct* as = checked_cast<AccelStruct*>(_as);
         Buffer* instanceBuffer = checked_cast<Buffer*>(_instanceBuffer);
@@ -1048,8 +1048,8 @@ namespace nvrhi::vulkan
 
         if (m_EnableAutomaticBarriers)
         {
-            requireBufferState(as->dataBuffer, nvrhi::ResourceStates::AccelStructWrite);
-            requireBufferState(instanceBuffer, nvrhi::ResourceStates::AccelStructBuildInput);
+            requireBufferState(as->dataBuffer, cutie::ResourceStates::AccelStructWrite);
+            requireBufferState(instanceBuffer, cutie::ResourceStates::AccelStructBuildInput);
             m_BindingStatesDirty = true;
         }
         commitBarriers();
@@ -1173,7 +1173,7 @@ namespace nvrhi::vulkan
 
     AccelStruct::~AccelStruct()
     {
-#ifdef NVRHI_WITH_RTXMU
+#ifdef CUTIE_WITH_RTXMU
         bool isManaged = desc.isTopLevel;
         if (!isManaged && rtxmuId != ~0ull)
         {
@@ -1210,7 +1210,7 @@ namespace nvrhi::vulkan
 
     uint64_t AccelStruct::getDeviceAddress() const
     {
-#ifdef NVRHI_WITH_RTXMU
+#ifdef CUTIE_WITH_RTXMU
         if (!desc.isTopLevel)
             return m_Context.rtxMemUtil->GetDeviceAddress(rtxmuId);
 #endif
@@ -1435,8 +1435,8 @@ namespace nvrhi::vulkan
         {
             // Ensure that the cache buffer is in the right state.
             // It's not conditional on m_EnableAutomaticBarriers because the cache is an internal object,
-            // completely invisible to the application, and so its state must be handled by NVRHI.
-            setBufferState(shaderTable->cache, nvrhi::ResourceStates::ShaderResource);
+            // completely invisible to the application, and so its state must be handled by CUTIE.
+            setBufferState(shaderTable->cache, cutie::ResourceStates::ShaderResource);
         }
 
         if (shaderTableCached || rebuildShaderTable)
@@ -1859,4 +1859,4 @@ namespace nvrhi::vulkan
             uint32_t(hitGroups.size()) +
             uint32_t(callableShaders.size());
     }
-} // namespace nvrhi::vulkan
+} // namespace cutie::vulkan

@@ -23,19 +23,19 @@
 #pragma once
 
 #include <vulkan/vulkan.h>
-#include <nvrhi/nvrhi.h>
+#include <cutie/cutie.h>
 
-namespace nvrhi 
+namespace cutie 
 {
     namespace ObjectTypes
     {
-        constexpr ObjectType Nvrhi_VK_Device = 0x00030101;
+        constexpr ObjectType Cutie_VK_Device = 0x00030101;
     };
 }
 
-namespace nvrhi::vulkan
+namespace cutie::vulkan
 {
-    class IDevice : public nvrhi::IDevice
+    class IDevice : public cutie::IDevice
     {
     public:
         // Additional Vulkan-specific public methods
@@ -81,9 +81,9 @@ namespace nvrhi::vulkan
         std::string vulkanLibraryName; // if empty, use default
     };
 
-    NVRHI_API DeviceHandle createDevice(const DeviceDesc& desc);
+    CUTIE_API DeviceHandle createDevice(const DeviceDesc& desc);
    
-    NVRHI_API VkFormat convertFormat(nvrhi::Format format);
+    CUTIE_API VkFormat convertFormat(cutie::Format format);
 
-    NVRHI_API const char* resultToString(VkResult result);
+    CUTIE_API const char* resultToString(VkResult result);
 }

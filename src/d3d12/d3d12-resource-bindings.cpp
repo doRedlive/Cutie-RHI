@@ -22,11 +22,11 @@
 
 #include "d3d12-backend.h"
 
-#include <nvrhi/common/misc.h>
+#include <cutie/common/misc.h>
 #include <sstream>
 #include <iomanip>
 
-namespace nvrhi::d3d12
+namespace cutie::d3d12
 {
     static ResourceType GetNormalizedResourceType(ResourceType type)
     {
@@ -1210,4 +1210,4 @@ namespace nvrhi::d3d12
     }
 
 
-} // namespace nvrhi::d3d12
+} // namespace cutie::d3d12

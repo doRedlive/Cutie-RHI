@@ -22,12 +22,12 @@
 
 #include "validation-backend.h"
 
-#include <nvrhi/utils.h>
-#include <nvrhi/common/misc.h>
+#include <cutie/utils.h>
+#include <cutie/common/misc.h>
 
 #include <sstream>
 
-namespace nvrhi::validation
+namespace cutie::validation
 {
     template<typename T>
     static std::unordered_set<T> SetDifference(std::unordered_set<T> const& a, std::unordered_set<T> const& b)
@@ -599,7 +599,7 @@ namespace nvrhi::validation
         return m_Device->createShaderSpecialization(baseShader, constants, numConstants);
     }
 
-    nvrhi::ShaderLibraryHandle DeviceWrapper::createShaderLibrary(const void* binary, const size_t binarySize)
+    cutie::ShaderLibraryHandle DeviceWrapper::createShaderLibrary(const void* binary, const size_t binarySize)
     {
         return m_Device->createShaderLibrary(binary, binarySize);
     }
@@ -1321,7 +1321,7 @@ namespace nvrhi::validation
         return createMeshletPipeline(pipelineDesc, fb->getFramebufferInfo());
     }
 
-    nvrhi::rt::PipelineHandle DeviceWrapper::createRayTracingPipeline(const rt::PipelineDesc& desc)
+    cutie::rt::PipelineHandle DeviceWrapper::createRayTracingPipeline(const rt::PipelineDesc& desc)
     {
         return m_Device->createRayTracingPipeline(desc);
     }
@@ -2049,31 +2049,31 @@ namespace nvrhi::validation
 
         if (validateClasParams)
         {
-            nvrhi::Format vertexFormat = params.clas.vertexFormat;
+            cutie::Format vertexFormat = params.clas.vertexFormat;
             const bool validVertexFormat =
-                (vertexFormat == nvrhi::Format::RGBA32_FLOAT)
-                || (vertexFormat == nvrhi::Format::RGB32_FLOAT)
-                || (vertexFormat == nvrhi::Format::RG32_FLOAT)
-                || (vertexFormat == nvrhi::Format::RGBA16_FLOAT)
-                || (vertexFormat == nvrhi::Format::RG16_FLOAT)
-                || (vertexFormat == nvrhi::Format::RGBA16_SNORM)
-                || (vertexFormat == nvrhi::Format::RG16_SNORM)
-                || (vertexFormat == nvrhi::Format::RGBA8_SNORM)
-                || (vertexFormat == nvrhi::Format::RG8_SNORM)
-                || (vertexFormat == nvrhi::Format::RGBA16_UNORM)
-                || (vertexFormat == nvrhi::Format::RG16_UNORM)
-                || (vertexFormat == nvrhi::Format::RGBA8_UNORM)
-                || (vertexFormat == nvrhi::Format::RG8_UNORM)
-                || (vertexFormat == nvrhi::Format::R10G10B10A2_UNORM);
+                (vertexFormat == cutie::Format::RGBA32_FLOAT)
+                || (vertexFormat == cutie::Format::RGB32_FLOAT)
+                || (vertexFormat == cutie::Format::RG32_FLOAT)
+                || (vertexFormat == cutie::Format::RGBA16_FLOAT)
+                || (vertexFormat == cutie::Format::RG16_FLOAT)
+                || (vertexFormat == cutie::Format::RGBA16_SNORM)
+                || (vertexFormat == cutie::Format::RG16_SNORM)
+                || (vertexFormat == cutie::Format::RGBA8_SNORM)
+                || (vertexFormat == cutie::Format::RG8_SNORM)
+                || (vertexFormat == cutie::Format::RGBA16_UNORM)
+                || (vertexFormat == cutie::Format::RG16_UNORM)
+                || (vertexFormat == cutie::Format::RGBA8_UNORM)
+                || (vertexFormat == cutie::Format::RG8_UNORM)
+                || (vertexFormat == cutie::Format::R10G10B10A2_UNORM);
             if (!validVertexFormat)
             {
                 error("cluster::OperationParams " + std::string(operationType) + " does not have a valid vertex format");
                 isValid = false;
             }
 
-            if (params.clas.maxGeometryIndex > nvrhi::rt::cluster::kMaxGeometryIndex)
+            if (params.clas.maxGeometryIndex > cutie::rt::cluster::kMaxGeometryIndex)
             {
-                error("cluster::OperationParams " + std::string(operationType) + " has a maxGeometryIndex over " + std::to_string(nvrhi::rt::cluster::kMaxGeometryIndex));
+                error("cluster::OperationParams " + std::string(operationType) + " has a maxGeometryIndex over " + std::to_string(cutie::rt::cluster::kMaxGeometryIndex));
                 isValid = false;
             }
 
@@ -2083,15 +2083,15 @@ namespace nvrhi::validation
                 isValid = false;
             }
 
-            if (params.clas.maxTriangleCount > nvrhi::rt::cluster::kClasMaxTriangles)
+            if (params.clas.maxTriangleCount > cutie::rt::cluster::kClasMaxTriangles)
             {
-                error("cluster::OperationParams " + std::string(operationType) + " maxTriangleCount over " + std::to_string(nvrhi::rt::cluster::kClasMaxTriangles));
+                error("cluster::OperationParams " + std::string(operationType) + " maxTriangleCount over " + std::to_string(cutie::rt::cluster::kClasMaxTriangles));
                 isValid = false;
             }
 
-            if (params.clas.maxVertexCount > nvrhi::rt::cluster::kClasMaxVertices)
+            if (params.clas.maxVertexCount > cutie::rt::cluster::kClasMaxVertices)
             {
-                error("cluster::OperationParams " + std::string(operationType) + " maxVertexCount over " + std::to_string(nvrhi::rt::cluster::kClasMaxVertices));
+                error("cluster::OperationParams " + std::string(operationType) + " maxVertexCount over " + std::to_string(cutie::rt::cluster::kClasMaxVertices));
                 isValid = false;
             }
 
@@ -2429,4 +2429,4 @@ namespace nvrhi::validation
         }
         return os;
     }
-} // namespace nvrhi::validation
+} // namespace cutie::validation

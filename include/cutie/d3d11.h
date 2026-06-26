@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include <nvrhi/nvrhi.h>
+#include <cutie/cutie.h>
 
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -30,12 +30,12 @@
 
 #include <d3d11.h>
 
-namespace nvrhi::ObjectTypes
+namespace cutie::ObjectTypes
 {
-    constexpr ObjectType Nvrhi_D3D11_Device = 0x00010101;
+    constexpr ObjectType Cutie_D3D11_Device = 0x00010101;
 };
 
-namespace nvrhi::d3d11
+namespace cutie::d3d11
 {
     struct DeviceDesc
     {
@@ -44,7 +44,7 @@ namespace nvrhi::d3d11
         bool aftermathEnabled = false;
     };
 
-    NVRHI_API DeviceHandle createDevice(const DeviceDesc& desc);
+    CUTIE_API DeviceHandle createDevice(const DeviceDesc& desc);
 
-    NVRHI_API DXGI_FORMAT convertFormat(nvrhi::Format format);
+    CUTIE_API DXGI_FORMAT convertFormat(cutie::Format format);
 }

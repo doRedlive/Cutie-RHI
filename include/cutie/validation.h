@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include <nvrhi/nvrhi.h>
+#include <cutie/cutie.h>
 
-namespace nvrhi::validation
+namespace cutie::validation
 {
-    NVRHI_API DeviceHandle createValidationLayer(IDevice* underlyingDevice);
+    CUTIE_API DeviceHandle createValidationLayer(IDevice* underlyingDevice);
 }

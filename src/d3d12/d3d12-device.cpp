@@ -22,9 +22,9 @@
 
 #include "d3d12-backend.h"
 
-#include <nvrhi/common/misc.h>
+#include <cutie/common/misc.h>
 
-#if NVRHI_D3D12_WITH_NVAPI
+#if CUTIE_D3D12_WITH_NVAPI
 #include <nvShaderExtnEnums.h>
 #endif
 
@@ -32,7 +32,7 @@
 #include <sstream>
 #include <iomanip>
 
-namespace nvrhi::d3d12
+namespace cutie::d3d12
 {
     void Context::error(const std::string& message) const
     {
@@ -44,7 +44,7 @@ namespace nvrhi::d3d12
         messageCallback->message(MessageSeverity::Info, message.c_str());
     }
 
-#if NVRHI_D3D12_WITH_NVAPI
+#if CUTIE_D3D12_WITH_NVAPI
     // Routes NVAPI ray tracing validation messages to the device's IMessageCallback.
     // May be invoked from an arbitrary driver thread; it only logs and must not touch the device.
     static void __stdcall raytracingValidationMessageCallback(
@@ -83,7 +83,7 @@ namespace nvrhi::d3d12
         }
     }
 
-#if NVRHI_D3D12_WITH_LINALG
+#if CUTIE_D3D12_WITH_LINALG
     static bool isLinearAlgebraDataTypeSupported(coopvec::DataType type)
     {
         switch (type)
@@ -170,7 +170,7 @@ namespace nvrhi::d3d12
 
             if (pQueue->lastCompletedInstance >= instance->submittedInstance)
             {
-#ifdef NVRHI_WITH_RTXMU
+#ifdef CUTIE_WITH_RTXMU
                 if (!instance->rtxmuBuildIds.empty())
                 {
                     std::lock_guard lockGuard(m_Resources.asListMutex);
@@ -230,11 +230,11 @@ namespace nvrhi::d3d12
         {
             m_RayTracingSupported = m_Options5.RaytracingTier >= D3D12_RAYTRACING_TIER_1_0;
             m_TraceRayInlineSupported = m_Options5.RaytracingTier >= D3D12_RAYTRACING_TIER_1_1;
-#if NVRHI_D3D12_WITH_DXR12_OPACITY_MICROMAP
+#if CUTIE_D3D12_WITH_DXR12_OPACITY_MICROMAP
             m_OpacityMicromapSupported = m_Options5.RaytracingTier >= D3D12_RAYTRACING_TIER_1_2;
-#endif // NVRHI_D3D12_WITH_DXR12_OPACITY_MICROMAP
+#endif // CUTIE_D3D12_WITH_DXR12_OPACITY_MICROMAP
 
-#ifdef NVRHI_WITH_RTXMU
+#ifdef CUTIE_WITH_RTXMU
             if (m_RayTracingSupported)
             {
                 m_Context.rtxMemUtil = std::make_unique<rtxmu::DxAccelStructManager>(m_Context.device5);
@@ -257,15 +257,15 @@ namespace nvrhi::d3d12
 
         if (SUCCEEDED(m_Context.device->QueryInterface(&m_Context.device10)) && hasOptions12 && desc.enableEnhancedBarriers)
         {
-#ifndef NVRHI_WITH_RTXMU // RTXMU doesn't implement Enhanced Barriers, and we need to interop with it.
+#ifndef CUTIE_WITH_RTXMU // RTXMU doesn't implement Enhanced Barriers, and we need to interop with it.
             m_EnhancedBarriersSupported = m_Options12.EnhancedBarriersSupported;
 #endif
         }
 
-#if NVRHI_D3D12_WITH_COOP_VECTOR_COMMON
+#if CUTIE_D3D12_WITH_COOP_VECTOR_COMMON
         if (SUCCEEDED(m_Context.device->QueryInterface(&m_Context.devicePreview)))
         {
-#if NVRHI_D3D12_WITH_LINALG
+#if CUTIE_D3D12_WITH_LINALG
             D3D12_FEATURE_DATA_LINEAR_ALGEBRA_SUPPORT linearAlgebraSupport{};
             if (SUCCEEDED(m_Context.device->CheckFeatureSupport(D3D12_FEATURE_LINEAR_ALGEBRA_SUPPORT, &linearAlgebraSupport, 
                 sizeof(linearAlgebraSupport))))
@@ -314,7 +314,7 @@ namespace nvrhi::d3d12
         
         m_FenceEvent = CreateEvent(nullptr, false, false, nullptr);
 
-#if NVRHI_D3D12_WITH_NVAPI
+#if CUTIE_D3D12_WITH_NVAPI
         //We need to use NVAPI to set resource hints for SLI
         m_NvapiIsInitialized = NvAPI_Initialize() == NVAPI_OK;
 
@@ -385,13 +385,13 @@ namespace nvrhi::d3d12
                 m_ShaderExecutionReorderingSupported = (ser & NVAPI_D3D12_RAYTRACING_THREAD_REORDERING_CAP_STANDARD) == NVAPI_D3D12_RAYTRACING_THREAD_REORDERING_CAP_STANDARD;
             }
         }
-#if NVRHI_D3D12_WITH_DXR12_OPACITY_MICROMAP
-    #ifdef NVRHI_WITH_RTXMU
+#if CUTIE_D3D12_WITH_DXR12_OPACITY_MICROMAP
+    #ifdef CUTIE_WITH_RTXMU
         m_OpacityMicromapSupported = false; // RTXMU does not support OMMs
     #endif
-#endif // NVRHI_D3D12_WITH_DXR12_OPACITY_MICROMAP
-#if NVRHI_WITH_NVAPI_OPACITY_MICROMAP
-#ifdef NVRHI_WITH_RTXMU
+#endif // CUTIE_D3D12_WITH_DXR12_OPACITY_MICROMAP
+#if CUTIE_WITH_NVAPI_OPACITY_MICROMAP
+#ifdef CUTIE_WITH_RTXMU
         m_OpacityMicromapSupported = false; // RTXMU does not support OMMs
 #else
         if (m_NvapiIsInitialized)
@@ -401,18 +401,18 @@ namespace nvrhi::d3d12
             m_OpacityMicromapSupported = caps == NVAPI_D3D12_RAYTRACING_OPACITY_MICROMAP_CAP_STANDARD;
         }
 #endif
-#endif // #if NVRHI_WITH_NVAPI_OPACITY_MICROMAPS
+#endif // #if CUTIE_WITH_NVAPI_OPACITY_MICROMAPS
 
-#if NVRHI_WITH_NVAPI_CLUSTERS
+#if CUTIE_WITH_NVAPI_CLUSTERS
         if (m_NvapiIsInitialized)
         {
             NVAPI_D3D12_RAYTRACING_CLUSTER_OPERATIONS_CAPS clusterCaps = NVAPI_D3D12_RAYTRACING_CLUSTER_OPERATIONS_CAP_NONE;
             NvAPI_D3D12_GetRaytracingCaps(m_Context.device5, NVAPI_D3D12_RAYTRACING_CAPS_TYPE_CLUSTER_OPERATIONS, &clusterCaps, sizeof(clusterCaps));
             m_RayTracingClustersSupported = clusterCaps == NVAPI_D3D12_RAYTRACING_CLUSTER_OPERATIONS_CAP_STANDARD;
         }
-#endif // #if NVRHI_WITH_NVAPI_CLUSTERS
+#endif // #if CUTIE_WITH_NVAPI_CLUSTERS
 
-#if NVRHI_WITH_NVAPI_LSS
+#if CUTIE_WITH_NVAPI_LSS
         if (m_NvapiIsInitialized)
         {
             NVAPI_D3D12_RAYTRACING_LINEAR_SWEPT_SPHERES_CAPS lssCaps = NVAPI_D3D12_RAYTRACING_LINEAR_SWEPT_SPHERES_CAP_NONE;
@@ -423,21 +423,21 @@ namespace nvrhi::d3d12
             NvAPI_D3D12_GetRaytracingCaps(m_Context.device5, NVAPI_D3D12_RAYTRACING_CAPS_TYPE_SPHERES, &spheresCaps, sizeof(NVAPI_D3D12_RAYTRACING_SPHERES_CAPS));
             m_SpheresSupported = spheresCaps == NVAPI_D3D12_RAYTRACING_SPHERES_CAP_STANDARD;
         }
-#endif // #if NVRHI_WITH_NVAPI_LSS
+#endif // #if CUTIE_WITH_NVAPI_LSS
 
-#if NVRHI_WITH_NVAPI_OPACITY_MICROMAP || NVRHI_WITH_NVAPI_CLUSTERS || NVRHI_WITH_NVAPI_LSS
+#if CUTIE_WITH_NVAPI_OPACITY_MICROMAP || CUTIE_WITH_NVAPI_CLUSTERS || CUTIE_WITH_NVAPI_LSS
         if (m_OpacityMicromapSupported || m_RayTracingClustersSupported || m_LinearSweptSpheresSupported || m_SpheresSupported)
         {
             NVAPI_D3D12_SET_CREATE_PIPELINE_STATE_OPTIONS_PARAMS params = {};
             params.version = NVAPI_D3D12_SET_CREATE_PIPELINE_STATE_OPTIONS_PARAMS_VER;
             params.flags = 0;
-        #if NVRHI_WITH_NVAPI_OPACITY_MICROMAP
+        #if CUTIE_WITH_NVAPI_OPACITY_MICROMAP
             params.flags |= (m_OpacityMicromapSupported ? NVAPI_D3D12_PIPELINE_CREATION_STATE_FLAGS_ENABLE_OMM_SUPPORT : 0);
         #endif
-        #if NVRHI_WITH_NVAPI_CLUSTERS
+        #if CUTIE_WITH_NVAPI_CLUSTERS
             params.flags |= (m_RayTracingClustersSupported ? NVAPI_D3D12_PIPELINE_CREATION_STATE_FLAGS_ENABLE_CLUSTER_SUPPORT : 0);
         #endif
-        #if NVRHI_WITH_NVAPI_LSS
+        #if CUTIE_WITH_NVAPI_LSS
             params.flags |= (m_LinearSweptSpheresSupported ? NVAPI_D3D12_PIPELINE_CREATION_STATE_FLAGS_ENABLE_LSS_SUPPORT : 0);
             params.flags |= (m_SpheresSupported ? NVAPI_D3D12_PIPELINE_CREATION_STATE_FLAGS_ENABLE_SPHERE_SUPPORT : 0);
         #endif
@@ -446,9 +446,9 @@ namespace nvrhi::d3d12
         }
 #endif
 
-#endif // #if NVRHI_D3D12_WITH_NVAPI
+#endif // #if CUTIE_D3D12_WITH_NVAPI
 
-#if NVRHI_WITH_AFTERMATH
+#if CUTIE_WITH_AFTERMATH
         if (desc.aftermathEnabled)
         {
             const uint32_t aftermathFlags = GFSDK_Aftermath_FeatureFlags_EnableMarkers | GFSDK_Aftermath_FeatureFlags_EnableResourceTracking | GFSDK_Aftermath_FeatureFlags_GenerateShaderDebugInfo | GFSDK_Aftermath_FeatureFlags_EnableShaderErrorReporting;
@@ -480,7 +480,7 @@ namespace nvrhi::d3d12
     {
         waitForIdle();
 
-#if NVRHI_D3D12_WITH_NVAPI
+#if CUTIE_D3D12_WITH_NVAPI
         if (m_RayTracingValidationEnabled)
         {
             // waitForIdle() already flushed; unregister now that no GPU work can produce more messages.
@@ -511,7 +511,7 @@ namespace nvrhi::d3d12
             }
         }
 
-#if NVRHI_D3D12_WITH_NVAPI
+#if CUTIE_D3D12_WITH_NVAPI
         // Report ray tracing validation messages for the GPU work that just completed. Doing this
         // after the fence waits also lets messages drain even when the device is being removed.
         if (m_RayTracingValidationEnabled)
@@ -597,7 +597,7 @@ namespace nvrhi::d3d12
         {
         case ObjectTypes::D3D12_Device:
             return Object(m_Context.device);
-        case ObjectTypes::Nvrhi_D3D12_Device:
+        case ObjectTypes::Cutie_D3D12_Device:
             return Object(this);
         case ObjectTypes::D3D12_CommandQueue:
             return Object(getQueue(CommandQueue::Graphics)->queue.Get());
@@ -606,7 +606,7 @@ namespace nvrhi::d3d12
         }
     }
 
-    nvrhi::CommandListHandle Device::createCommandList(const CommandListParameters& params)
+    cutie::CommandListHandle Device::createCommandList(const CommandListParameters& params)
     {
         if (!getQueue(params.queueType))
             return nullptr;
@@ -614,7 +614,7 @@ namespace nvrhi::d3d12
         return CommandListHandle::Create(new CommandList(this, m_Context, m_Resources, params));
     }
     
-    uint64_t Device::executeCommandLists(nvrhi::ICommandList* const* pCommandLists, size_t numCommandLists, CommandQueue executionQueue)
+    uint64_t Device::executeCommandLists(cutie::ICommandList* const* pCommandLists, size_t numCommandLists, CommandQueue executionQueue)
     {
         std::vector<ID3D12CommandList*> commandListsToExecute(numCommandLists);
         for (size_t i = 0; i < numCommandLists; i++)
@@ -754,7 +754,7 @@ namespace nvrhi::d3d12
             pQueue->lifetimeTracker->runGarbageCollection();
         }
 
-#if NVRHI_D3D12_WITH_NVAPI
+#if CUTIE_D3D12_WITH_NVAPI
         // Drain ray tracing validation messages for GPU work that has completed since the last call.
         // runGarbageCollection() runs once per frame, giving per-frame message granularity.
         if (m_RayTracingValidationEnabled)
@@ -834,13 +834,13 @@ namespace nvrhi::d3d12
             }
             return true;
         case Feature::CooperativeVectorInferencing:
-#if NVRHI_D3D12_WITH_LINALG
+#if CUTIE_D3D12_WITH_LINALG
             return m_LinearAlgebraSupported;
 #else
             return m_CoopVecInferencingSupported;
 #endif
         case Feature::CooperativeVectorTraining:
-#if NVRHI_D3D12_WITH_LINALG
+#if CUTIE_D3D12_WITH_LINALG
             return m_LinearAlgebraSupported;
 #else
             return m_CoopVecTrainingSupported;
@@ -904,8 +904,8 @@ namespace nvrhi::d3d12
     coopvec::DeviceFeatures Device::queryCoopVecFeatures()
     {
         coopvec::DeviceFeatures result;
-#if NVRHI_D3D12_WITH_COOP_VECTOR_COMMON
-#if NVRHI_D3D12_WITH_LINALG
+#if CUTIE_D3D12_WITH_COOP_VECTOR_COMMON
+#if CUTIE_D3D12_WITH_LINALG
         // Matrix multiplication support is queried per combination on this path.
         if (!m_LinearAlgebraSupported)
         {
@@ -960,8 +960,8 @@ namespace nvrhi::d3d12
     {
         coopvec::MatMulFormatSupport result{};
 
-#if NVRHI_D3D12_WITH_COOP_VECTOR_COMMON
-#if NVRHI_D3D12_WITH_LINALG
+#if CUTIE_D3D12_WITH_COOP_VECTOR_COMMON
+#if CUTIE_D3D12_WITH_LINALG
         if (!m_LinearAlgebraSupported)
             return result;
 
@@ -1039,11 +1039,11 @@ namespace nvrhi::d3d12
             }
         }
         return result;
-#endif // NVRHI_D3D12_WITH_LINALG
+#endif // CUTIE_D3D12_WITH_LINALG
 #else
         (void)combination;
         return result;
-#endif // NVRHI_D3D12_WITH_COOP_VECTOR_COMMON
+#endif // CUTIE_D3D12_WITH_COOP_VECTOR_COMMON
     }
 
     // Queries D3D12 training support for a single accumulation component type.
@@ -1051,8 +1051,8 @@ namespace nvrhi::d3d12
     coopvec::TrainingFormatSupport Device::queryCoopVecTrainingFormatSupport(coopvec::DataType componentType)
     {
         coopvec::TrainingFormatSupport result{};
-#if NVRHI_D3D12_WITH_COOP_VECTOR_COMMON
-#if NVRHI_D3D12_WITH_LINALG
+#if CUTIE_D3D12_WITH_COOP_VECTOR_COMMON
+#if CUTIE_D3D12_WITH_LINALG
         if (!m_LinearAlgebraSupported)
             return result;
 
@@ -1137,8 +1137,8 @@ namespace nvrhi::d3d12
 
     size_t Device::getCoopVecMatrixSize(coopvec::DataType type, coopvec::MatrixLayout layout, int rows, int columns)
     {
-#if NVRHI_D3D12_WITH_COOP_VECTOR_COMMON
-#if NVRHI_D3D12_WITH_LINALG
+#if CUTIE_D3D12_WITH_COOP_VECTOR_COMMON
+#if CUTIE_D3D12_WITH_LINALG
         if (!m_LinearAlgebraSupported || !m_Context.devicePreview)
             return 0;
 
@@ -1208,7 +1208,7 @@ namespace nvrhi::d3d12
         heapDesc.Alignment = D3D12_DEFAULT_MSAA_RESOURCE_PLACEMENT_ALIGNMENT;
         heapDesc.Properties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
         heapDesc.Properties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-        heapDesc.Properties.CreationNodeMask = 1; // no mGPU support in nvrhi so far
+        heapDesc.Properties.CreationNodeMask = 1; // no mGPU support in cutie so far
         heapDesc.Properties.VisibleNodeMask = 1;
 
         if (m_Options.ResourceHeapTier == D3D12_RESOURCE_HEAP_TIER_1)
@@ -1257,4 +1257,4 @@ namespace nvrhi::d3d12
         return HeapHandle::Create(heap);
     }
 
-} // namespace nvrhi::d3d12
+} // namespace cutie::d3d12

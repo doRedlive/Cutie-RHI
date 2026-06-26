@@ -22,9 +22,9 @@
 
 #include "d3d12-backend.h"
 
-namespace nvrhi::d3d12
+namespace cutie::d3d12
 {
-    DXGI_FORMAT convertFormat(nvrhi::Format format)
+    DXGI_FORMAT convertFormat(cutie::Format format)
     {
         return getDxgiFormatMapping(format).srvFormat;
     }
@@ -401,9 +401,9 @@ namespace nvrhi::d3d12
             {
                 const EnhancedResourceStateMapping& mapping = g_ResourceStateMap[bitIndex];
 
-                assert(uint32_t(mapping.nvrhiState) == bit);
+                assert(uint32_t(mapping.cutieState) == bit);
 
-                result.nvrhiState = ResourceStates(result.nvrhiState | mapping.nvrhiState);
+                result.cutieState = ResourceStates(result.cutieState | mapping.cutieState);
                 result.access |= mapping.access;
                 result.sync |= mapping.sync;
                 if (isTexture)
@@ -424,7 +424,7 @@ namespace nvrhi::d3d12
             bitIndex++;
         }
 
-        assert(result.nvrhiState == state);
+        assert(result.cutieState == state);
 
         return result;
     }
@@ -469,7 +469,7 @@ namespace nvrhi::d3d12
         }
     }
 
-#if NVRHI_D3D12_WITH_COOP_VECTOR_COMMON
+#if CUTIE_D3D12_WITH_COOP_VECTOR_COMMON
     D3D12_LINEAR_ALGEBRA_DATATYPE convertCoopVecDataType(coopvec::DataType type)
     {
         switch (type)
@@ -479,7 +479,7 @@ namespace nvrhi::d3d12
         case coopvec::DataType::SInt8:
             return D3D12_LINEAR_ALGEBRA_DATATYPE_SINT8;
         case coopvec::DataType::UInt8Packed:
-#if NVRHI_D3D12_WITH_LINALG
+#if CUTIE_D3D12_WITH_LINALG
             // Not support in 720
             utils::InvalidEnum();
             return D3D12_LINEAR_ALGEBRA_DATATYPE_FLOAT32;
@@ -487,7 +487,7 @@ namespace nvrhi::d3d12
             return D3D12_LINEAR_ALGEBRA_DATATYPE_UINT8_T4_PACKED;
 #endif
         case coopvec::DataType::SInt8Packed:
-#if NVRHI_D3D12_WITH_LINALG
+#if CUTIE_D3D12_WITH_LINALG
             // Not support in 720
             utils::InvalidEnum();
             return D3D12_LINEAR_ALGEBRA_DATATYPE_FLOAT32;
@@ -503,13 +503,13 @@ namespace nvrhi::d3d12
         case coopvec::DataType::SInt32:
             return D3D12_LINEAR_ALGEBRA_DATATYPE_SINT32;
         case coopvec::DataType::FloatE4M3:
-#if NVRHI_D3D12_WITH_LINALG
+#if CUTIE_D3D12_WITH_LINALG
             return D3D12_LINEAR_ALGEBRA_DATATYPE_FLOAT8_E4M3FN;
 #else
             return D3D12_LINEAR_ALGEBRA_DATATYPE_FLOAT_E4M3;
 #endif
         case coopvec::DataType::FloatE5M2:
-#if NVRHI_D3D12_WITH_LINALG
+#if CUTIE_D3D12_WITH_LINALG
             return D3D12_LINEAR_ALGEBRA_DATATYPE_FLOAT8_E5M2;
 #else
             return D3D12_LINEAR_ALGEBRA_DATATYPE_FLOAT_E5M2;
@@ -532,7 +532,7 @@ namespace nvrhi::d3d12
             return coopvec::DataType::UInt8;
         case D3D12_LINEAR_ALGEBRA_DATATYPE_SINT8:
             return coopvec::DataType::SInt8;
-#if !NVRHI_D3D12_WITH_LINALG
+#if !CUTIE_D3D12_WITH_LINALG
         case D3D12_LINEAR_ALGEBRA_DATATYPE_UINT8_T4_PACKED:
             return coopvec::DataType::UInt8Packed;
         case D3D12_LINEAR_ALGEBRA_DATATYPE_SINT8_T4_PACKED:
@@ -546,7 +546,7 @@ namespace nvrhi::d3d12
             return coopvec::DataType::UInt32;
         case D3D12_LINEAR_ALGEBRA_DATATYPE_SINT32:
             return coopvec::DataType::SInt32;
-#if NVRHI_D3D12_WITH_LINALG
+#if CUTIE_D3D12_WITH_LINALG
         case D3D12_LINEAR_ALGEBRA_DATATYPE_FLOAT8_E4M3FN:
             return coopvec::DataType::FloatE4M3;
         case D3D12_LINEAR_ALGEBRA_DATATYPE_FLOAT8_E5M2:
@@ -586,4 +586,4 @@ namespace nvrhi::d3d12
     }
 #endif
 
-} // namespace nvrhi::d3d12
+} // namespace cutie::d3d12

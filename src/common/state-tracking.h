@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include <nvrhi/nvrhi.h>
+#include <cutie/cutie.h>
 #include <memory>
 #include <unordered_map>
 
-namespace nvrhi
+namespace cutie
 {
     struct BufferStateExtension
     {
@@ -143,4 +143,4 @@ namespace nvrhi
     // So, use the binding layout's visibility mask to determine if a pixel shader might be necessary.
     ResourceStates getShaderResourceStateForBindingLayout(IBindingLayout* bindingLayout);
 
-} // namespace nvrhi
+} // namespace cutie

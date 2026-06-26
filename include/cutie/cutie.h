@@ -23,9 +23,9 @@
 #pragma once
 
 
-#include <nvrhi/common/containers.h>
-#include <nvrhi/common/resource.h>
-#include <nvrhi/nvrhiHLSL.h>
+#include <cutie/common/containers.h>
+#include <cutie/common/resource.h>
+#include <cutie/cutieHLSL.h>
 
 #include <cstdint>
 #include <cmath>
@@ -33,7 +33,7 @@
 #include <string>
 #include <vector>
 
-#define NVRHI_ENUM_CLASS_FLAG_OPERATORS(T) \
+#define CUTIE_ENUM_CLASS_FLAG_OPERATORS(T) \
     inline T operator | (T a, T b) { return T(uint32_t(a) | uint32_t(b)); } \
     inline T operator & (T a, T b) { return T(uint32_t(a) & uint32_t(b)); } /* NOLINT(bugprone-macro-parentheses) */ \
     inline T operator ~ (T a) { return T(~uint32_t(a)); } /* NOLINT(bugprone-macro-parentheses) */ \
@@ -41,34 +41,34 @@
     inline bool operator ==(T a, uint32_t b) { return uint32_t(a) == b; } \
     inline bool operator !=(T a, uint32_t b) { return uint32_t(a) != b; }
 
-#if defined(NVRHI_SHARED_LIBRARY_BUILD)
+#if defined(CUTIE_SHARED_LIBRARY_BUILD)
 #   if defined(_MSC_VER)
-#       define NVRHI_API __declspec(dllexport)
+#       define CUTIE_API __declspec(dllexport)
 #   elif defined(__GNUC__)
-#       define NVRHI_API __attribute__((visibility("default")))
+#       define CUTIE_API __attribute__((visibility("default")))
 #   else
-#       define NVRHI_API
+#       define CUTIE_API
 #       pragma warning "Unknown dynamic link import/export semantics."
 #   endif
-#elif defined(NVRHI_SHARED_LIBRARY_INCLUDE)
+#elif defined(CUTIE_SHARED_LIBRARY_INCLUDE)
 #   if defined(_MSC_VER)
-#       define NVRHI_API __declspec(dllimport)
+#       define CUTIE_API __declspec(dllimport)
 #   else
-#       define NVRHI_API
+#       define CUTIE_API
 #   endif
 #else
-#   define NVRHI_API
+#   define CUTIE_API
 #endif
 
-namespace nvrhi
+namespace cutie
 {
-    // Version of the public API provided by NVRHI.
+    // Version of the public API provided by CUTIE.
     // Increment this when any changes to the API are made.
     static constexpr uint32_t c_HeaderVersion = 26;
 
     // Verifies that the version of the implementation matches the version of the header.
-    // Returns true if they match. Use this when initializing apps using NVRHI as a shared library.
-    NVRHI_API bool verifyHeaderVersion(uint32_t version = c_HeaderVersion);
+    // Returns true if they match. Use this when initializing apps using CUTIE as a shared library.
+    CUTIE_API bool verifyHeaderVersion(uint32_t version = c_HeaderVersion);
 
     static constexpr uint32_t c_MaxRenderTargets = 8;
     static constexpr uint32_t c_MaxViewports = 16;
@@ -154,7 +154,8 @@ namespace nvrhi
     {
         D3D11,
         D3D12,
-        VULKAN
+        VULKAN,
+        OPENGL
     };
 
     enum class Format : uint8_t
@@ -261,7 +262,7 @@ namespace nvrhi
         bool isSRGB : 1;
     };
 
-    NVRHI_API const FormatInfo& getFormatInfo(Format format);
+    CUTIE_API const FormatInfo& getFormatInfo(Format format);
 
     enum class FormatSupport : uint32_t
     {
@@ -283,7 +284,7 @@ namespace nvrhi
         ShaderAtomic    = 0x00000800,
     };
 
-    NVRHI_ENUM_CLASS_FLAG_OPERATORS(FormatSupport)
+    CUTIE_ENUM_CLASS_FLAG_OPERATORS(FormatSupport)
 
     //////////////////////////////////////////////////////////////////////////
     // Heap
@@ -378,7 +379,7 @@ namespace nvrhi
         ConvertCoopVecMatrixOutput  = 0x02000000,
     };
 
-    NVRHI_ENUM_CLASS_FLAG_OPERATORS(ResourceStates)
+    CUTIE_ENUM_CLASS_FLAG_OPERATORS(ResourceStates)
 
     typedef uint32_t MipLevel;
     typedef uint32_t ArraySlice;
@@ -402,7 +403,7 @@ namespace nvrhi
         Shared_CrossAdapter = 0x04,
     };
 
-    NVRHI_ENUM_CLASS_FLAG_OPERATORS(SharedResourceFlags)
+    CUTIE_ENUM_CLASS_FLAG_OPERATORS(SharedResourceFlags)
 
     struct TextureDesc
     {
@@ -485,7 +486,7 @@ namespace nvrhi
         MipLevel mipLevel = 0;
         ArraySlice arraySlice = 0;
 
-        [[nodiscard]] NVRHI_API TextureSlice resolve(const TextureDesc& desc) const;
+        [[nodiscard]] CUTIE_API TextureSlice resolve(const TextureDesc& desc) const;
 
         constexpr TextureSlice& setOrigin(uint32_t vx = 0, uint32_t vy = 0, uint32_t vz = 0) { x = vx; y = vy; z = vz; return *this; }
         constexpr TextureSlice& setWidth(uint32_t value) { width = value; return *this; }
@@ -516,8 +517,8 @@ namespace nvrhi
         {
         }
 
-        [[nodiscard]] NVRHI_API TextureSubresourceSet resolve(const TextureDesc& desc, bool singleMipLevel) const;
-        [[nodiscard]] NVRHI_API bool isEntireTexture(const TextureDesc& desc) const;
+        [[nodiscard]] CUTIE_API TextureSubresourceSet resolve(const TextureDesc& desc, bool singleMipLevel) const;
+        [[nodiscard]] CUTIE_API bool isEntireTexture(const TextureDesc& desc) const;
 
         bool operator ==(const TextureSubresourceSet& other) const
         {
@@ -745,7 +746,7 @@ namespace nvrhi
             , byteSize(_byteSize)
         { }
 
-        [[nodiscard]] NVRHI_API BufferRange resolve(const BufferDesc& desc) const;
+        [[nodiscard]] CUTIE_API BufferRange resolve(const BufferDesc& desc) const;
         [[nodiscard]] constexpr bool isEntireBuffer(const BufferDesc& desc) const { return (byteOffset == 0) && (byteSize == ~0ull || byteSize == desc.byteSize); }
         constexpr bool operator== (const BufferRange& other) const { return byteOffset == other.byteOffset && byteSize == other.byteSize; }
 
@@ -795,7 +796,7 @@ namespace nvrhi
         All             = 0x3FFF,
     };
 
-    NVRHI_ENUM_CLASS_FLAG_OPERATORS(ShaderType)
+    CUTIE_ENUM_CLASS_FLAG_OPERATORS(ShaderType)
 
     enum class FastGeometryShaderFlags : uint8_t
     {
@@ -805,7 +806,7 @@ namespace nvrhi
         StrictApiOrder                   = 0x08
     };
 
-    NVRHI_ENUM_CLASS_FLAG_OPERATORS(FastGeometryShaderFlags)
+    CUTIE_ENUM_CLASS_FLAG_OPERATORS(FastGeometryShaderFlags)
 
     struct CustomSemantic
     {
@@ -959,7 +960,7 @@ namespace nvrhi
         All = 0xF
     };
 
-    NVRHI_ENUM_CLASS_FLAG_OPERATORS(ColorMask)
+    CUTIE_ENUM_CLASS_FLAG_OPERATORS(ColorMask)
 
     struct BlendState
     {
@@ -985,7 +986,7 @@ namespace nvrhi
             constexpr RenderTarget& setBlendOpAlpha(BlendOp value) { blendOpAlpha = value; return *this; }
             constexpr RenderTarget& setColorWriteMask(ColorMask value) { colorWriteMask = value; return *this; }
 
-            [[nodiscard]] NVRHI_API bool usesConstantColor() const;
+            [[nodiscard]] CUTIE_API bool usesConstantColor() const;
 
             constexpr bool operator ==(const RenderTarget& other) const
             {
@@ -1320,7 +1321,7 @@ namespace nvrhi
         uint32_t sampleQuality = 0;
 
         FramebufferInfo() = default;
-        NVRHI_API FramebufferInfo(const FramebufferDesc& desc);
+        CUTIE_API FramebufferInfo(const FramebufferDesc& desc);
         
         bool operator==(const FramebufferInfo& other) const
         {
@@ -1353,7 +1354,7 @@ namespace nvrhi
         uint32_t arraySize = 1;
 
         FramebufferInfoEx() = default;
-        NVRHI_API FramebufferInfoEx(const FramebufferDesc& desc);
+        CUTIE_API FramebufferInfoEx(const FramebufferDesc& desc);
 
         FramebufferInfoEx& setWidth(uint32_t value) { width = value; return *this; }
         FramebufferInfoEx& setHeight(uint32_t value) { height = value; return *this; }
@@ -1394,7 +1395,7 @@ namespace nvrhi
             AllowCompaction = 4
         };
 
-        NVRHI_ENUM_CLASS_FLAG_OPERATORS(OpacityMicromapBuildFlags)
+        CUTIE_ENUM_CLASS_FLAG_OPERATORS(OpacityMicromapBuildFlags)
 
         struct OpacityMicromapUsageCount
         {
@@ -1471,7 +1472,7 @@ namespace nvrhi
             NoDuplicateAnyHitInvocation = 2
         };
 
-        NVRHI_ENUM_CLASS_FLAG_OPERATORS(GeometryFlags)
+        CUTIE_ENUM_CLASS_FLAG_OPERATORS(GeometryFlags)
 
         enum class GeometryType : uint8_t
         {
@@ -1657,7 +1658,7 @@ namespace nvrhi
             DisableOMMs = 32,
         };
 
-        NVRHI_ENUM_CLASS_FLAG_OPERATORS(InstanceFlags)
+        CUTIE_ENUM_CLASS_FLAG_OPERATORS(InstanceFlags)
 
         struct InstanceDesc
         {
@@ -1703,13 +1704,13 @@ namespace nvrhi
             MinimizeMemory = 0x10,
             PerformUpdate = 0x20,
 
-            // Removes the errors or warnings that NVRHI validation layer issues when a TLAS
+            // Removes the errors or warnings that CUTIE validation layer issues when a TLAS
             // includes an instance that points at a NULL BLAS or has a zero instance mask.
             // Only affects the validation layer, doesn't translate to Vk/DX12 AS build flags.
             AllowEmptyInstances = 0x80
         };
 
-        NVRHI_ENUM_CLASS_FLAG_OPERATORS(AccelStructBuildFlags)
+        CUTIE_ENUM_CLASS_FLAG_OPERATORS(AccelStructBuildFlags)
 
         struct AccelStructDesc
         {
@@ -1781,7 +1782,7 @@ namespace nvrhi
                 NoOverlap = 0x4,
                 AllowOMM = 0x8
             };
-            NVRHI_ENUM_CLASS_FLAG_OPERATORS(OperationFlags);
+            CUTIE_ENUM_CLASS_FLAG_OPERATORS(OperationFlags);
 
             enum class OperationIndexFormat : uint8_t
             {
@@ -1931,7 +1932,7 @@ namespace nvrhi
         uint32_t getArraySize() const { return (type == ResourceType::PushConstants) ? 1 : size; }
 
         // Helper functions for strongly typed initialization
-#define NVRHI_BINDING_LAYOUT_ITEM_INITIALIZER(TYPE) /* NOLINT(cppcoreguidelines-macro-usage) */ \
+#define CUTIE_BINDING_LAYOUT_ITEM_INITIALIZER(TYPE) /* NOLINT(cppcoreguidelines-macro-usage) */ \
         static BindingLayoutItem TYPE(const uint32_t slot) { \
             BindingLayoutItem result{}; \
             result.slot = slot; \
@@ -1939,19 +1940,19 @@ namespace nvrhi
             result.size = 1; \
             return result; }
 
-        NVRHI_BINDING_LAYOUT_ITEM_INITIALIZER(Texture_SRV)
-        NVRHI_BINDING_LAYOUT_ITEM_INITIALIZER(Texture_UAV)
-        NVRHI_BINDING_LAYOUT_ITEM_INITIALIZER(TypedBuffer_SRV)
-        NVRHI_BINDING_LAYOUT_ITEM_INITIALIZER(TypedBuffer_UAV)
-        NVRHI_BINDING_LAYOUT_ITEM_INITIALIZER(StructuredBuffer_SRV)
-        NVRHI_BINDING_LAYOUT_ITEM_INITIALIZER(StructuredBuffer_UAV)
-        NVRHI_BINDING_LAYOUT_ITEM_INITIALIZER(RawBuffer_SRV)
-        NVRHI_BINDING_LAYOUT_ITEM_INITIALIZER(RawBuffer_UAV)
-        NVRHI_BINDING_LAYOUT_ITEM_INITIALIZER(ConstantBuffer)
-        NVRHI_BINDING_LAYOUT_ITEM_INITIALIZER(VolatileConstantBuffer)
-        NVRHI_BINDING_LAYOUT_ITEM_INITIALIZER(Sampler)
-        NVRHI_BINDING_LAYOUT_ITEM_INITIALIZER(RayTracingAccelStruct)
-        NVRHI_BINDING_LAYOUT_ITEM_INITIALIZER(SamplerFeedbackTexture_UAV)
+        CUTIE_BINDING_LAYOUT_ITEM_INITIALIZER(Texture_SRV)
+        CUTIE_BINDING_LAYOUT_ITEM_INITIALIZER(Texture_UAV)
+        CUTIE_BINDING_LAYOUT_ITEM_INITIALIZER(TypedBuffer_SRV)
+        CUTIE_BINDING_LAYOUT_ITEM_INITIALIZER(TypedBuffer_UAV)
+        CUTIE_BINDING_LAYOUT_ITEM_INITIALIZER(StructuredBuffer_SRV)
+        CUTIE_BINDING_LAYOUT_ITEM_INITIALIZER(StructuredBuffer_UAV)
+        CUTIE_BINDING_LAYOUT_ITEM_INITIALIZER(RawBuffer_SRV)
+        CUTIE_BINDING_LAYOUT_ITEM_INITIALIZER(RawBuffer_UAV)
+        CUTIE_BINDING_LAYOUT_ITEM_INITIALIZER(ConstantBuffer)
+        CUTIE_BINDING_LAYOUT_ITEM_INITIALIZER(VolatileConstantBuffer)
+        CUTIE_BINDING_LAYOUT_ITEM_INITIALIZER(Sampler)
+        CUTIE_BINDING_LAYOUT_ITEM_INITIALIZER(RayTracingAccelStruct)
+        CUTIE_BINDING_LAYOUT_ITEM_INITIALIZER(SamplerFeedbackTexture_UAV)
 
         static BindingLayoutItem PushConstants(const uint32_t slot, const size_t size)
         {
@@ -1961,7 +1962,7 @@ namespace nvrhi
             result.size = uint16_t(size);
             return result;
         }
-#undef NVRHI_BINDING_LAYOUT_ITEM_INITIALIZER
+#undef CUTIE_BINDING_LAYOUT_ITEM_INITIALIZER
     };
 
     // verify the packing of BindingLayoutItem for good alignment
@@ -2363,7 +2364,7 @@ namespace nvrhi
     {
         std::vector<BindingSetItem> bindings;
        
-        // Enables automatic liveness tracking of this binding set by nvrhi command lists.
+        // Enables automatic liveness tracking of this binding set by cutie command lists.
         // By setting trackLiveness to false, you take the responsibility of not releasing it 
         // until all rendering commands using the binding set are finished.
         bool trackLiveness = true;
@@ -2989,7 +2990,7 @@ namespace nvrhi
         struct MatrixLayoutDesc
         {
             // Buffer where the matrix is stored.
-            nvrhi::IBuffer* buffer = nullptr;
+            cutie::IBuffer* buffer = nullptr;
 
             // Offset in bytes from the start of the buffer where the matrix starts.
             uint64_t offset = 0;
@@ -3021,11 +3022,11 @@ namespace nvrhi
         };
 
         // Returns the size in bytes of a given data type.
-        NVRHI_API size_t getDataTypeSize(DataType type);
+        CUTIE_API size_t getDataTypeSize(DataType type);
 
         // Returns the stride for a given matrix if it's stored in a RowMajor or ColumnMajor layout.
         // For other layouts, returns 0.
-        NVRHI_API size_t getOptimalMatrixStride(DataType type, MatrixLayout layout, uint32_t rows, uint32_t columns);
+        CUTIE_API size_t getOptimalMatrixStride(DataType type, MatrixLayout layout, uint32_t rows, uint32_t columns);
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -3098,7 +3099,7 @@ namespace nvrhi
         virtual ~IMessageCallback() = default;
 
     public:
-        // NVRHI will call message(...) whenever it needs to signal something.
+        // CUTIE will call message(...) whenever it needs to signal something.
         // The application is free to ignore the messages, show message boxes, or terminate.
         virtual void message(MessageSeverity severity, const char* messageText) = 0;
 
@@ -3176,7 +3177,7 @@ namespace nvrhi
     //   also contains the upload manager (for suballocating memory from the upload heap on operations such as
     //   writeBuffer) and the DXR scratch manager (for suballocating memory for acceleration structure builds).
     //   The upload and scratch managers' memory is reused when possible, but it is only freed when the command list
-    //   object is destroyed. Thus, it might be a good idea to use a dedicated NVRHI command list for uploading large
+    //   object is destroyed. Thus, it might be a good idea to use a dedicated CUTIE command list for uploading large
     //   amounts of data and to destroy it when uploading is finished.
     // - Vulkan: The command list objects don't own the VkCommandBuffer-s but request available ones from the queue
     //   instead. The upload and scratch buffers behave the same way they do on DX12.
@@ -3196,9 +3197,9 @@ namespace nvrhi
         // Re-opening the command list without execution is allowed but not well-tested.
         virtual void close() = 0;
 
-        // Resets the NVRHI state cache associated with the command list, clears some of the underlying API state.
+        // Resets the CUTIE state cache associated with the command list, clears some of the underlying API state.
         // This method is mostly useful when switching from recording commands to the open command list using 
-        // non-NVRHI code - see getNativeObject(...) - to recording further commands using NVRHI.
+        // non-CUTIE code - see getNativeObject(...) - to recording further commands using CUTIE.
         virtual void clearState() = 0;
 
         // Clears some or all subresources of the given color texture using the provided color.
@@ -3299,7 +3300,7 @@ namespace nvrhi
         //   See https://microsoft.github.io/DirectX-Specs/d3d/SamplerFeedback.html
         // - DX11, Vulkan: Unsupported.
         virtual void decodeSamplerFeedbackTexture(IBuffer* buffer, ISamplerFeedbackTexture* texture,
-            nvrhi::Format format) = 0;
+            cutie::Format format) = 0;
 
         // Transitions the sampler feedback texture into the requested state, placing a barrier if necessary.
         // The barrier is appended into the pending barrier list and not issued immediately,
@@ -3312,22 +3313,22 @@ namespace nvrhi
         // A graphics, compute, ray tracing or meshlet state must be set using the corresponding call
         // (setGraphicsState etc.) before using setPushConstants. Changing the state invalidates push constants.
         // - DX11: Push constants for all pipelines and command lists use a single buffer associated with the
-        //   NVRHI context. This function maps to UpdateSubresource on that buffer.
+        //   CUTIE context. This function maps to UpdateSubresource on that buffer.
         // - DX12: Push constants map to root constants in the PSO/root signature. This function maps to 
         //   SetGraphicsRoot32BitConstants for graphics or meshlet pipelines, and SetComputeRoot32BitConstants for
         //   compute or ray tracing pipelines.
         // - Vulkan: Push constants are just Vulkan push constants. This function maps to vkCmdPushConstants.
-        // Note that NVRHI only supports one push constants binding in all layouts used in a pipeline.
+        // Note that CUTIE only supports one push constants binding in all layouts used in a pipeline.
         virtual void setPushConstants(const void* data, size_t byteSize) = 0;
 
         // Sets the specified graphics state on the command list.
         // The state includes the pipeline (or individual shaders on DX11) and all resources bound to it,
         // from input buffers to render targets. See the members of GraphicsState for more information.
-        // State is cached by NVRHI, so if some parts of it are not modified by the setGraphicsState(...) call,
+        // State is cached by CUTIE, so if some parts of it are not modified by the setGraphicsState(...) call,
         // the corresponding changes won't be made on the underlying graphics API. When combining command list
-        // operations made through NVRHI and through direct access to the command list, state caching may lead to
+        // operations made through CUTIE and through direct access to the command list, state caching may lead to
         // incomplete or incorrect state being set on the underlying API because of cache mismatch with the actual
-        // state. To avoid these issues, call clearState() when switching from direct command list access to NVRHI.
+        // state. To avoid these issues, call clearState() when switching from direct command list access to CUTIE.
         virtual void setGraphicsState(const GraphicsState& state) = 0;
 
         // Draws non-indexed primitives using the current graphics state.
@@ -3473,13 +3474,13 @@ namespace nvrhi
         // - DX12: Maps to BuildRaytracingAccelerationStructure, or NvAPI_D3D12_BuildRaytracingAccelerationStructureEx
         //   if Opacity Micromaps or Line-Swept Sphere geometries are supported by the device.
         // - Vulkan: Maps to vkCmdBuildAccelerationStructuresKHR.
-        // If NVRHI is built with RTXMU enabled, all BLAS builds, updates and compactions are handled by RTXMU.
+        // If CUTIE is built with RTXMU enabled, all BLAS builds, updates and compactions are handled by RTXMU.
         // Note that RTXMU currently doesn't support OMM or LSS.
         virtual void buildBottomLevelAccelStruct(rt::IAccelStruct* as, const rt::GeometryDesc* pGeometries,
             size_t numGeometries, rt::AccelStructBuildFlags buildFlags = rt::AccelStructBuildFlags::None) = 0;
         
         // Compacts all bottom-level ray tracing acceleration structures (BLASes) that are currently available
-        // for compaction. This process is handled by the RTXMU library. If NVRHI is built without RTXMU,
+        // for compaction. This process is handled by the RTXMU library. If CUTIE is built without RTXMU,
         // this function has no effect.
         virtual void compactBottomLevelAccelStructs() = 0;
 
@@ -3515,13 +3516,13 @@ namespace nvrhi
 
         // Builds or updates a top-level ray tracing acceleration structure (TLAS) using instance data provided
         // through a buffer on the GPU. The buffer must be pre-filled with rt::InstanceDesc structures using a
-        // copy operation or a shader. No validation on the buffer contents is performed by NVRHI, and no state
+        // copy operation or a shader. No validation on the buffer contents is performed by CUTIE, and no state
         // or liveness tracking is done for the referenced BLAS'es.
         // See the comment to buildTopLevelAccelStruct(...) for more information.
         // - DX11: Not supported.
         // - DX12: Maps to BuildRaytracingAccelerationStructure.
         // - Vulkan: Maps to vkCmdBuildAccelerationStructuresKHR.
-        virtual void buildTopLevelAccelStructFromBuffer(rt::IAccelStruct* as, nvrhi::IBuffer* instanceBuffer,
+        virtual void buildTopLevelAccelStructFromBuffer(rt::IAccelStruct* as, cutie::IBuffer* instanceBuffer,
             uint64_t instanceBufferOffset, size_t numInstances,
             rt::AccelStructBuildFlags buildFlags = rt::AccelStructBuildFlags::None) = 0;
 
@@ -3573,7 +3574,7 @@ namespace nvrhi
         virtual void setResourceStatesForBindingSet(IBindingSet* bindingSet) = 0;
         
         // Sets the necessary resource states for all targets of the framebuffer.
-        NVRHI_API void setResourceStatesForFramebuffer(IFramebuffer* framebuffer);
+        CUTIE_API void setResourceStatesForFramebuffer(IFramebuffer* framebuffer);
 
         // Enables or disables the placement of UAV barriers for the given texture (DX12/VK) or all resources (DX11)
         // between draw or dispatch calls. Disabling UAV barriers may improve performance in cases when the same
@@ -3581,7 +3582,7 @@ namespace nvrhi
         // Note that this only affects barriers between multiple uses of the same texture as a UAV, and the
         // transition barrier when the texture is first used as a UAV will still be placed.
         // - DX11: Maps to NvAPI_D3D11_BeginUAVOverlap (once - see source code) and requires NVAPI.
-        // - DX12, Vulkan: Does not map to any specific API calls, affects NVRHI automatic barriers.
+        // - DX12, Vulkan: Does not map to any specific API calls, affects CUTIE automatic barriers.
         virtual void setEnableUavBarriersForTexture(ITexture* texture, bool enableBarriers) = 0;
 
         // Enables or disables the placement of UAV barriers for the given buffer (DX12/VK) or all resources (DX11)
@@ -3813,62 +3814,62 @@ namespace nvrhi
     }
 }
 
-#undef NVRHI_ENUM_CLASS_FLAG_OPERATORS
+#undef CUTIE_ENUM_CLASS_FLAG_OPERATORS
 
 namespace std
 {
-    template<typename T> struct hash<nvrhi::RefCountPtr<T>>
+    template<typename T> struct hash<cutie::RefCountPtr<T>>
     {
-        std::size_t operator()(nvrhi::RefCountPtr<T> const& s) const noexcept
+        std::size_t operator()(cutie::RefCountPtr<T> const& s) const noexcept
         {
             std::hash<T*> hash;
             return hash(s.Get());
         }
     };
 
-    template<> struct hash<nvrhi::TextureSubresourceSet>
+    template<> struct hash<cutie::TextureSubresourceSet>
     {
-        std::size_t operator()(nvrhi::TextureSubresourceSet const& s) const noexcept
+        std::size_t operator()(cutie::TextureSubresourceSet const& s) const noexcept
         {
             size_t hash = 0;
-            nvrhi::hash_combine(hash, s.baseMipLevel);
-            nvrhi::hash_combine(hash, s.numMipLevels);
-            nvrhi::hash_combine(hash, s.baseArraySlice);
-            nvrhi::hash_combine(hash, s.numArraySlices);
+            cutie::hash_combine(hash, s.baseMipLevel);
+            cutie::hash_combine(hash, s.numMipLevels);
+            cutie::hash_combine(hash, s.baseArraySlice);
+            cutie::hash_combine(hash, s.numArraySlices);
             return hash;
         }
     };
 
-    template<> struct hash<nvrhi::BufferRange>
+    template<> struct hash<cutie::BufferRange>
     {
-        std::size_t operator()(nvrhi::BufferRange const& s) const noexcept
+        std::size_t operator()(cutie::BufferRange const& s) const noexcept
         {
             size_t hash = 0;
-            nvrhi::hash_combine(hash, s.byteOffset);
-            nvrhi::hash_combine(hash, s.byteSize);
+            cutie::hash_combine(hash, s.byteOffset);
+            cutie::hash_combine(hash, s.byteSize);
             return hash;
         }
     };
 
-    template<> struct hash<nvrhi::BindingSetItem>
+    template<> struct hash<cutie::BindingSetItem>
     {
-        std::size_t operator()(nvrhi::BindingSetItem const& s) const noexcept
+        std::size_t operator()(cutie::BindingSetItem const& s) const noexcept
         {
             size_t value = 0;
-            nvrhi::hash_combine(value, s.resourceHandle);
-            nvrhi::hash_combine(value, s.slot);
-            nvrhi::hash_combine(value, s.type);
-            nvrhi::hash_combine(value, s.dimension);
-            nvrhi::hash_combine(value, s.format);
-            nvrhi::hash_combine(value, s.rawData[0]);
-            nvrhi::hash_combine(value, s.rawData[1]);
+            cutie::hash_combine(value, s.resourceHandle);
+            cutie::hash_combine(value, s.slot);
+            cutie::hash_combine(value, s.type);
+            cutie::hash_combine(value, s.dimension);
+            cutie::hash_combine(value, s.format);
+            cutie::hash_combine(value, s.rawData[0]);
+            cutie::hash_combine(value, s.rawData[1]);
             return value;
         }
     };
 
-    template<> struct hash<nvrhi::BindingSetDesc>
+    template<> struct hash<cutie::BindingSetDesc>
     {
-        std::size_t operator()(nvrhi::BindingSetDesc const& s) const noexcept
+        std::size_t operator()(cutie::BindingSetDesc const& s) const noexcept
         {
             size_t value = 0;
             for (const auto& item : s.bindings)
@@ -3877,58 +3878,58 @@ namespace std
         }
     };
 
-    template<> struct hash<nvrhi::FramebufferInfo>
+    template<> struct hash<cutie::FramebufferInfo>
     {
-        std::size_t operator()(nvrhi::FramebufferInfo const& s) const noexcept
+        std::size_t operator()(cutie::FramebufferInfo const& s) const noexcept
         {
             size_t hash = 0;
             for (auto format : s.colorFormats)
-                nvrhi::hash_combine(hash, format);
-            nvrhi::hash_combine(hash, s.depthFormat);
-            nvrhi::hash_combine(hash, s.sampleCount);
-            nvrhi::hash_combine(hash, s.sampleQuality);
+                cutie::hash_combine(hash, format);
+            cutie::hash_combine(hash, s.depthFormat);
+            cutie::hash_combine(hash, s.sampleCount);
+            cutie::hash_combine(hash, s.sampleQuality);
             return hash;
         }
     };
 
-    template<> struct hash<nvrhi::BlendState::RenderTarget>
+    template<> struct hash<cutie::BlendState::RenderTarget>
     {
-        std::size_t operator()(nvrhi::BlendState::RenderTarget const& s) const noexcept
+        std::size_t operator()(cutie::BlendState::RenderTarget const& s) const noexcept
         {
             size_t hash = 0;
-            nvrhi::hash_combine(hash, s.blendEnable);
-            nvrhi::hash_combine(hash, s.srcBlend);
-            nvrhi::hash_combine(hash, s.destBlend);
-            nvrhi::hash_combine(hash, s.blendOp);
-            nvrhi::hash_combine(hash, s.srcBlendAlpha);
-            nvrhi::hash_combine(hash, s.destBlendAlpha);
-            nvrhi::hash_combine(hash, s.blendOpAlpha);
-            nvrhi::hash_combine(hash, s.colorWriteMask);
+            cutie::hash_combine(hash, s.blendEnable);
+            cutie::hash_combine(hash, s.srcBlend);
+            cutie::hash_combine(hash, s.destBlend);
+            cutie::hash_combine(hash, s.blendOp);
+            cutie::hash_combine(hash, s.srcBlendAlpha);
+            cutie::hash_combine(hash, s.destBlendAlpha);
+            cutie::hash_combine(hash, s.blendOpAlpha);
+            cutie::hash_combine(hash, s.colorWriteMask);
             return hash;
         }
     };
 
-    template<> struct hash<nvrhi::BlendState>
+    template<> struct hash<cutie::BlendState>
     {
-        std::size_t operator()(nvrhi::BlendState const& s) const noexcept
+        std::size_t operator()(cutie::BlendState const& s) const noexcept
         {
             size_t hash = 0;
-            nvrhi::hash_combine(hash, s.alphaToCoverageEnable);
+            cutie::hash_combine(hash, s.alphaToCoverageEnable);
             for (const auto& target : s.targets)
-                nvrhi::hash_combine(hash, target);
+                cutie::hash_combine(hash, target);
             return hash;
         }
     };
     
-    template<> struct hash<nvrhi::VariableRateShadingState>
+    template<> struct hash<cutie::VariableRateShadingState>
     {
-        std::size_t operator()(nvrhi::VariableRateShadingState const& s) const noexcept
+        std::size_t operator()(cutie::VariableRateShadingState const& s) const noexcept
         {
             size_t hash = 0;
-            nvrhi::hash_combine(hash, s.enabled);
-            nvrhi::hash_combine(hash, s.shadingRate);
-            nvrhi::hash_combine(hash, s.pipelinePrimitiveCombiner);
-            nvrhi::hash_combine(hash, s.imageCombiner);
+            cutie::hash_combine(hash, s.enabled);
+            cutie::hash_combine(hash, s.shadingRate);
+            cutie::hash_combine(hash, s.pipelinePrimitiveCombiner);
+            cutie::hash_combine(hash, s.imageCombiner);
             return hash;
         }
     };

@@ -22,7 +22,7 @@
 
 #include "vulkan-backend.h"
 
-namespace nvrhi::vulkan
+namespace cutie::vulkan
 {
 
     CommandList::CommandList(Device* device, const VulkanContext& context, const CommandListParameters& parameters)
@@ -33,7 +33,7 @@ namespace nvrhi::vulkan
         , m_UploadManager(std::make_unique<UploadManager>(device, parameters.uploadChunkSize, 0, false))
         , m_ScratchManager(std::make_unique<UploadManager>(device, parameters.scratchChunkSize, parameters.scratchMaxMemory, true))
     {
-#if NVRHI_WITH_AFTERMATH
+#if CUTIE_WITH_AFTERMATH
         if (m_Device->isAftermathEnabled())
             m_Device->getAftermathCrashDumpHelper().registerAftermathMarkerTracker(&m_AftermathTracker);
 #endif
@@ -41,13 +41,13 @@ namespace nvrhi::vulkan
 
     CommandList::~CommandList()
     {
-#if NVRHI_WITH_AFTERMATH
+#if CUTIE_WITH_AFTERMATH
         if (m_Device->isAftermathEnabled())
             m_Device->getAftermathCrashDumpHelper().unRegisterAftermathMarkerTracker(&m_AftermathTracker);
 #endif
     }
 
-    nvrhi::Object CommandList::getNativeObject(ObjectType objectType)
+    cutie::Object CommandList::getNativeObject(ObjectType objectType)
     {
         switch (objectType)
         {
@@ -79,7 +79,7 @@ namespace nvrhi::vulkan
         m_StateTracker.keepTextureInitialStates();
         commitBarriers();
 
-#ifdef NVRHI_WITH_RTXMU
+#ifdef CUTIE_WITH_RTXMU
         if (!m_CurrentCmdBuf->rtxmuBuildIds.empty())
         {
             m_Context.rtxMemUtil->PopulateCompactionSizeCopiesCommandList(m_CurrentCmdBuf->cmdBuf, m_CurrentCmdBuf->rtxmuBuildIds);
@@ -186,12 +186,12 @@ namespace nvrhi::vulkan
             vkDesc.srcLayout = convertCoopVecMatrixLayout(desc.src.layout);
             vkDesc.srcStride = desc.src.stride != 0
                 ? desc.src.stride
-                : nvrhi::coopvec::getOptimalMatrixStride(desc.src.type, desc.src.layout, desc.numRows, desc.numColumns);
+                : cutie::coopvec::getOptimalMatrixStride(desc.src.type, desc.src.layout, desc.numRows, desc.numColumns);
 
             vkDesc.dstLayout = convertCoopVecMatrixLayout(desc.dst.layout);
             vkDesc.dstStride = desc.dst.stride != 0
                 ? desc.dst.stride
-                : nvrhi::coopvec::getOptimalMatrixStride(desc.dst.type, desc.dst.layout, desc.numRows, desc.numColumns);
+                : cutie::coopvec::getOptimalMatrixStride(desc.dst.type, desc.dst.layout, desc.numRows, desc.numColumns);
         }
 
         commitBarriers();

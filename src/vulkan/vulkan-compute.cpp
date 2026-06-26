@@ -21,9 +21,9 @@
 */
 
 #include "vulkan-backend.h"
-#include <nvrhi/common/misc.h>
+#include <cutie/common/misc.h>
 
-namespace nvrhi::vulkan
+namespace cutie::vulkan
 {
     ComputePipelineHandle Device::createComputePipeline(const ComputePipelineDesc& desc)
     {
@@ -184,4 +184,4 @@ namespace nvrhi::vulkan
         m_CurrentCmdBuf->cmdBuf.dispatchIndirect(indirectParams->buffer, offsetBytes);
     }
 
-} // namespace nvrhi::vulkan
+} // namespace cutie::vulkan

@@ -21,10 +21,10 @@
 */
 
 #include "vulkan-backend.h"
-#include <nvrhi/common/misc.h>
+#include <cutie/common/misc.h>
 #include <sstream>
 
-namespace nvrhi::vulkan
+namespace cutie::vulkan
 {
 
     BindingLayoutHandle Device::createBindingLayout(const BindingLayoutDesc& desc)
@@ -463,13 +463,13 @@ namespace nvrhi::vulkan
                     format = buffer->desc.format;
                 }
 
-                auto vkformat = nvrhi::vulkan::convertFormat(format);
+                auto vkformat = cutie::vulkan::convertFormat(format);
                 const auto range = binding.range.resolve(buffer->desc);
 
                 size_t viewInfoHash = 0;
-                nvrhi::hash_combine(viewInfoHash, range.byteOffset);
-                nvrhi::hash_combine(viewInfoHash, range.byteSize);
-                nvrhi::hash_combine(viewInfoHash, (uint64_t)vkformat);
+                cutie::hash_combine(viewInfoHash, range.byteOffset);
+                cutie::hash_combine(viewInfoHash, range.byteSize);
+                cutie::hash_combine(viewInfoHash, (uint64_t)vkformat);
 
                 const auto& bufferViewFound = buffer->viewCache.find(viewInfoHash);
                 auto& bufferViewRef = (bufferViewFound != buffer->viewCache.end()) ? bufferViewFound->second : buffer->viewCache[viewInfoHash];
@@ -808,13 +808,13 @@ namespace nvrhi::vulkan
             {
                 const auto& buffer = checked_cast<Buffer*>(binding.resourceHandle);
 
-                auto vkformat = nvrhi::vulkan::convertFormat(binding.format);
+                auto vkformat = cutie::vulkan::convertFormat(binding.format);
 
                 const auto range = binding.range.resolve(buffer->desc);
                 size_t viewInfoHash = 0;
-                nvrhi::hash_combine(viewInfoHash, range.byteOffset);
-                nvrhi::hash_combine(viewInfoHash, range.byteSize);
-                nvrhi::hash_combine(viewInfoHash, (uint64_t)vkformat);
+                cutie::hash_combine(viewInfoHash, range.byteOffset);
+                cutie::hash_combine(viewInfoHash, range.byteSize);
+                cutie::hash_combine(viewInfoHash, (uint64_t)vkformat);
 
                 const auto& bufferViewFound = buffer->viewCache.find(viewInfoHash);
                 auto& bufferViewRef = (bufferViewFound != buffer->viewCache.end()) ? bufferViewFound->second : buffer->viewCache[viewInfoHash];
@@ -1124,4 +1124,4 @@ namespace nvrhi::vulkan
         return res;
     }
 
-} // namespace nvrhi::vulkan
+} // namespace cutie::vulkan

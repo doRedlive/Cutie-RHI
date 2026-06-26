@@ -21,14 +21,14 @@
 */
 
 #include "d3d11-backend.h"
-#include <nvrhi/common/containers.h>
-#include <nvrhi/common/misc.h>
-#include <nvrhi/utils.h>
+#include <cutie/common/containers.h>
+#include <cutie/common/misc.h>
+#include <cutie/utils.h>
 
 #include <algorithm>
 
 
-namespace nvrhi::d3d11
+namespace cutie::d3d11
 {
 
 BindingLayoutHandle Device::createBindingLayout(const BindingLayoutDesc& desc)
@@ -500,4 +500,4 @@ void CommandList::bindComputeResourceSets(
 
 #undef D3D11_SET_ARRAY
 
-} // namespace nvrhi::d3d11
+} // namespace cutie::d3d11

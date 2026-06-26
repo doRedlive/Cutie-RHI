@@ -21,11 +21,11 @@
 */
 
 #include "d3d11-backend.h"
-#include <nvrhi/utils.h>
+#include <cutie/utils.h>
 
-namespace nvrhi::d3d11
+namespace cutie::d3d11
 {
-    DXGI_FORMAT convertFormat(nvrhi::Format format)
+    DXGI_FORMAT convertFormat(cutie::Format format)
     {
         return getDxgiFormatMapping(format).srvFormat;
     }
@@ -220,4 +220,4 @@ namespace nvrhi::d3d11
     }
 
 
-} // namespace nvrhi::d3d11
+} // namespace cutie::d3d11

@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include <nvrhi/nvrhi.h>
+#include <cutie/cutie.h>
 
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -30,16 +30,16 @@
 
 #include <directx/d3d12.h>
 
-namespace nvrhi
+namespace cutie
 {
     namespace ObjectTypes
     {
-        constexpr ObjectType Nvrhi_D3D12_Device         = 0x00020101;
-        constexpr ObjectType Nvrhi_D3D12_CommandList    = 0x00020102;
+        constexpr ObjectType Cutie_D3D12_Device         = 0x00020101;
+        constexpr ObjectType Cutie_D3D12_CommandList    = 0x00020102;
     };
 }
 
-namespace nvrhi::d3d12
+namespace cutie::d3d12
 {
     class IRootSignature : public IResource
     {
@@ -47,7 +47,7 @@ namespace nvrhi::d3d12
 
     typedef RefCountPtr<IRootSignature> RootSignatureHandle;
 
-    class ICommandList : public nvrhi::ICommandList
+    class ICommandList : public cutie::ICommandList
     {
     public:
         virtual bool allocateUploadBuffer(size_t size, void** pCpuAddress, D3D12_GPU_VIRTUAL_ADDRESS* pGpuAddress) = 0;
@@ -92,7 +92,7 @@ namespace nvrhi::d3d12
         Sampler
     };
 
-    class IDevice : public nvrhi::IDevice
+    class IDevice : public cutie::IDevice
     {
     public:
         // D3D12-specific methods
@@ -130,7 +130,7 @@ namespace nvrhi::d3d12
         bool logBufferLifetime = false;
 
         // Enable NVAPI ray tracing validation (NvAPI_D3D12_EnableRaytracingValidation).
-        // Requires NVAPI. The nvrhi::Device constructor sets the NV_ALLOW_RAYTRACING_VALIDATION=1
+        // Requires NVAPI. The cutie::Device constructor sets the NV_ALLOW_RAYTRACING_VALIDATION=1
         // environment variable automatically, so callers don't need to export it beforehand.
         // Validation must be enabled before any other ray tracing call (including capability
         // queries).
@@ -141,7 +141,7 @@ namespace nvrhi::d3d12
         bool enableEnhancedBarriers = true;
     };
 
-    NVRHI_API DeviceHandle createDevice(const DeviceDesc& desc);
+    CUTIE_API DeviceHandle createDevice(const DeviceDesc& desc);
 
-    NVRHI_API DXGI_FORMAT convertFormat(nvrhi::Format format);
+    CUTIE_API DXGI_FORMAT convertFormat(cutie::Format format);
 }

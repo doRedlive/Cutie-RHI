@@ -1,41 +1,41 @@
-# NVRHI Tutorial
+# CUTIE Tutorial
 
-This tutorial provides a walk-through of the process of integrating NVRHI into a program and using it to render an object in a scene using rasterization and ray tracing pipelines.
+This tutorial provides a walk-through of the process of integrating CUTIE into a program and using it to render an object in a scene using rasterization and ray tracing pipelines.
 
 ## Basic Graphics Example
 
 ### Creating the Device
 
-The first step after we include the NVRHI headers and libraries into your project is to create a device wrapper. Assuming the underlying device, context, queues, etc. have been initialized, the NVRHI wrapper can be created using one of the following snippets - they cover different graphics APIs.
+The first step after we include the CUTIE headers and libraries into your project is to create a device wrapper. Assuming the underlying device, context, queues, etc. have been initialized, the CUTIE wrapper can be created using one of the following snippets - they cover different graphics APIs.
 
 #### Direct3D 11
 ```c++
-#include <nvrhi/d3d11.h>
+#include <cutie/d3d11.h>
 ...
-nvrhi::d3d11::DeviceDesc deviceDesc;
+cutie::d3d11::DeviceDesc deviceDesc;
 deviceDesc.messageCallback = g_MyMessageCallback;
 deviceDesc.context = d3d11DeviceContext;
 
-nvrhi::DeviceHandle nvrhiDevice = nvrhi::d3d11::createDevice(deviceDesc);
+cutie::DeviceHandle cutieDevice = cutie::d3d11::createDevice(deviceDesc);
 ```
 
 #### Direct3D 12
 
 ```c++
-#include <nvrhi/d3d12.h>
+#include <cutie/d3d12.h>
 ...
-nvrhi::d3d12::DeviceDesc deviceDesc;
+cutie::d3d12::DeviceDesc deviceDesc;
 deviceDesc.errorCB = g_MyMessageCallback;
 deviceDesc.pDevice = d3d12Device;
 deviceDesc.pGraphicsCommandQueue = d3d12GraphicsCommandQueue;
 
-nvrhi::DeviceHandle nvrhiDevice = nvrhi::d3d12::createDevice(deviceDesc);
+cutie::DeviceHandle cutieDevice = cutie::d3d12::createDevice(deviceDesc);
 ```
 
 #### Vulkan
 
 ```c++
-#include <nvrhi/vulkan.h>
+#include <cutie/vulkan.h>
 ...
 const char* deviceExtensions[] = {
     "VK_KHR_acceleration_structure",
@@ -43,7 +43,7 @@ const char* deviceExtensions[] = {
     "VK_KHR_ray_tracing_pipeline",
     // list the extensions that were requested when the device was created
 };
-nvrhi::vulkan::DeviceDesc deviceDesc;
+cutie::vulkan::DeviceDesc deviceDesc;
 deviceDesc.errorCB = g_MyMessageCallback;
 deviceDesc.physicalDevice = vulkanPhysicalDevice;
 deviceDesc.device = vulkanDevice;
@@ -52,43 +52,43 @@ deviceDesc.graphicsQueueIndex = vulkanGraphicsQueueFamily;
 deviceDesc.deviceExtensions = deviceExtensions;
 deviceDesc.numDeviceExtensions = std::size(deviceExtensions);
 
-nvrhi::DeviceHandle nvrhiDevice = nvrhi::vulkan::createDevice(deviceDesc);
+cutie::DeviceHandle cutieDevice = cutie::vulkan::createDevice(deviceDesc);
 ```
 
 #### Validation
 ```c++
-#include <nvrhi/validation.h>
+#include <cutie/validation.h>
 ...
 if (enableValidation) {
-    nvrhi::DeviceHandle nvrhiValidationLayer = nvrhi::validation::createValidationLayer(nvrhiDevice);
-    nvrhiDevice = nvrhiValidationLayer; // make the rest of the application go through the validation layer
+    cutie::DeviceHandle cutieValidationLayer = cutie::validation::createValidationLayer(cutieDevice);
+    cutieDevice = cutieValidationLayer; // make the rest of the application go through the validation layer
 }
 ```
 
 ### Creating the Swap Chain Textures
 
-In order to draw something on the screen, the renderer needs to be able to access the swap chain. NVRHI does not create the swap chain, but it provides the means to create wrappers for native swap chain textures. This is done through the same function on all GAPIs:
+In order to draw something on the screen, the renderer needs to be able to access the swap chain. CUTIE does not create the swap chain, but it provides the means to create wrappers for native swap chain textures. This is done through the same function on all GAPIs:
 
 ```c++
-auto textureDesc = nvrhi::TextureDesc()
-    .setDimension(nvrhi::TextureDimension::Texture2D)
-    .setFormat(nvrhi::Format::RGBA8_UNORM)
+auto textureDesc = cutie::TextureDesc()
+    .setDimension(cutie::TextureDimension::Texture2D)
+    .setFormat(cutie::Format::RGBA8_UNORM)
     .setWidth(swapChainWidth)
     .setHeight(swapChainHeight)
     .setIsRenderTarget(true)
     .setDebugName("Swap Chain Image");
 
 // In this line, <type> depends on the GAPI and should be one of: D3D11_Resource, D3D12_Resource, VK_Image.
-nvrhi::TextureHandle swapChainTexture = nvrhiDevice->createHandleForNativeTexture(nvrhi::ObjectTypes::<type>, nativeTextureOrImage, textureDesc);
+cutie::TextureHandle swapChainTexture = cutieDevice->createHandleForNativeTexture(cutie::ObjectTypes::<type>, nativeTextureOrImage, textureDesc);
 ```
 
 Now, the `swapChainTexture` variable holds a strong reference to the swap chain texture. It can be used to create a `Framebuffer` object to be rendered into.
 
 ```c++
-auto framebufferDesc = nvrhi::FramebufferDesc()
+auto framebufferDesc = cutie::FramebufferDesc()
     .addColorAttachment(swapChainTexture); // you can specify a particular subresource if necessary
 
-nvrhi::FramebufferHandle framebuffer = nvrhiDevice->createFramebuffer(framebufferDesc);
+cutie::FramebufferHandle framebuffer = cutieDevice->createFramebuffer(framebufferDesc);
 ```
 
 On D3D12 and Vulkan, multiple swap chain textures and explicit access synchronization is necessary; this is out of scope for this article, and working implementations can be found in the `DeviceManager` classes in Donut: [D3D11](https://github.com/NVIDIA-RTX/Donut/blob/main/src/app/dx11/DeviceManager_DX11.cpp), [D3D12](https://github.com/NVIDIA-RTX/Donut/blob/main/src/app/dx12/DeviceManager_DX12.cpp), [Vulkan](https://github.com/NVIDIA-RTX/Donut/blob/main/src/app/vulkan/DeviceManager_VK.cpp).
@@ -109,36 +109,36 @@ struct Vertex {
     float texCoord[2];
 };
 
-nvrhi::ShaderHandle vertexShader = nvrhiDevice->createShader(
-    nvrhi::ShaderDesc().setShaderType(nvrhi::ShaderType::Vertex),
+cutie::ShaderHandle vertexShader = cutieDevice->createShader(
+    cutie::ShaderDesc().setShaderType(cutie::ShaderType::Vertex),
     g_VertexShader, sizeof(g_VertexShader));
 
-nvrhi::VertexAttributeDesc attributes[] = {
-    nvrhi::VertexAttributeDesc()
+cutie::VertexAttributeDesc attributes[] = {
+    cutie::VertexAttributeDesc()
         .setName("POSITION")
-        .setFormat(nvrhi::Format::RGB32_FLOAT)
+        .setFormat(cutie::Format::RGB32_FLOAT)
         .setOffset(offsetof(Vertex, position))
         .setElementStride(sizeof(Vertex)),
-    nvrhi::VertexAttributeDesc()
+    cutie::VertexAttributeDesc()
         .setName("TEXCOORD")
-        .setFormat(nvrhi::Format::RG32_FLOAT)
+        .setFormat(cutie::Format::RG32_FLOAT)
         .setOffset(offsetof(Vertex, texCoord))
         .setElementStride(sizeof(Vertex)),
 };
 
-nvrhi::InputLayoutHandle inputLayout = nvrhiDevice->createInputLayout(
+cutie::InputLayoutHandle inputLayout = cutieDevice->createInputLayout(
     attributes, uint32_t(std::size(attributes)), vertexShader);
 
-nvrhi::ShaderHandle pixelShader = nvrhiDevice->createShader(
-    nvrhi::ShaderDesc().setShaderType(nvrhi::ShaderType::Pixel),
+cutie::ShaderHandle pixelShader = cutieDevice->createShader(
+    cutie::ShaderDesc().setShaderType(cutie::ShaderType::Pixel),
     g_PixelShader, sizeof(g_PixelShader));
 ```
 
 In order to create the pipeline, we need to know which render target formats will be used. This information is provided through the `FramebufferInfo` structure:
 
 ```c++
-auto framebufferInfo = nvrhi::FramebufferInfo()
-    .addColorFormat(nvrhi::Format::RGBA8_UNORM);
+auto framebufferInfo = cutie::FramebufferInfo()
+    .addColorFormat(cutie::Format::RGBA8_UNORM);
 ```
 
 Alternatively, `FramebufferInfo` can be obtained from a `Framebuffer` object, if one is available at the time of pipeline creation:
@@ -150,26 +150,26 @@ auto framebufferInfo = framebuffer->getFramebufferInfo();
 Finally, the pipeline will need to bind some resources, such as constant buffers and textures. We need to declare which resources will be bound to which shader binding slots using a "binding layout" object. For example, let's say our vertex shader will need the view-projection matrix at constant buffer slot b0, and the pixel shader will need the texture at texture slot t0. We'll declare both items in the same layout, visible to all shader stages for simplicity. If necessary, a pipeline can use multiple layouts with different visibility masks to separate the bindings.
 
 ```c++
-auto layoutDesc = nvrhi::BindingLayoutDesc()
-    .setVisibility(nvrhi::ShaderType::All)
-    .addItem(nvrhi::BindingLayoutItem::Texture_SRV(0))             // texture at t0
-    .addItem(nvrhi::BindingLayoutItem::VolatileConstantBuffer(0)); // constants at b0
+auto layoutDesc = cutie::BindingLayoutDesc()
+    .setVisibility(cutie::ShaderType::All)
+    .addItem(cutie::BindingLayoutItem::Texture_SRV(0))             // texture at t0
+    .addItem(cutie::BindingLayoutItem::VolatileConstantBuffer(0)); // constants at b0
 
-nvrhi::BindingLayoutHandle bindingLayout = nvrhiDevice->createBindingLayout(layoutDesc);
+cutie::BindingLayoutHandle bindingLayout = cutieDevice->createBindingLayout(layoutDesc);
 ```
 
-You may have noticed that the snippet above references a `VolatileConstantBuffer`. That is a special type of constant buffer supported by NVRHI that is more lightweight than a separate buffer object on D3D12 and Vulkan, and has unique semantics, somewhat similar to push constants (which are also supported). For more information on volatile buffers, see the [Programming Guide](ProgrammingGuide.md#buffers).
+You may have noticed that the snippet above references a `VolatileConstantBuffer`. That is a special type of constant buffer supported by CUTIE that is more lightweight than a separate buffer object on D3D12 and Vulkan, and has unique semantics, somewhat similar to push constants (which are also supported). For more information on volatile buffers, see the [Programming Guide](ProgrammingGuide.md#buffers).
 
 With all the prerequisites ready, let's create the pipeline:
 
 ```c++
-auto pipelineDesc = nvrhi::GraphicsPipelineDesc()
+auto pipelineDesc = cutie::GraphicsPipelineDesc()
     .setInputLayout(inputLayout)
     .setVertexShader(vertexShader)
     .setPixelShader(pixelShader)
     .addBindingLayout(bindingLayout);
 
-nvrhi::GraphicsPipelineHandle graphicsPipeline = nvrhiDevice->createGraphicsPipeline(pipelineDesc, framebufferInfo);
+cutie::GraphicsPipelineHandle graphicsPipeline = cutieDevice->createGraphicsPipeline(pipelineDesc, framebufferInfo);
 ```
 
 Note that the `PipelineDesc`, `BindingLayoutDesc` and other `*Desc` structures are saved in the objects that were created using them, and can be retrieved using the `getDesc()` method of the corresponding object later.
@@ -181,13 +181,13 @@ In order to draw something using the pipeline that we just created, we need thre
 Creating a constant buffer is the easiest part:
 
 ```c++
-auto constantBufferDesc = nvrhi::BufferDesc()
+auto constantBufferDesc = cutie::BufferDesc()
     .setByteSize(sizeof(float) * 16) // stores one matrix
     .setIsConstantBuffer(true)
     .setIsVolatile(true)
     .setMaxVersions(16); // number of automatic versions, only necessary on Vulkan
 
-nvrhi::BufferHandle constantBuffer = nvrhiDevice->createBuffer(constantBufferDesc);
+cutie::BufferHandle constantBuffer = cutieDevice->createBuffer(constantBufferDesc);
 ```
 
 Now let's create a vertex buffer:
@@ -200,34 +200,34 @@ static const Vertex g_Vertices[] = {
     // and so on...
 };
 
-auto vertexBufferDesc = nvrhi::BufferDesc()
+auto vertexBufferDesc = cutie::BufferDesc()
     .setByteSize(sizeof(g_Vertices))
     .setIsVertexBuffer(true)
-    .enableAutomaticStateTracking(nvrhi::ResourceStates::VertexBuffer)
+    .enableAutomaticStateTracking(cutie::ResourceStates::VertexBuffer)
     .setDebugName("Vertex Buffer");
 
-nvrhi::BufferHandle vertexBuffer = nvrhiDevice->createBuffer(vertexBufferDesc);
+cutie::BufferHandle vertexBuffer = cutieDevice->createBuffer(vertexBufferDesc);
 ```
 
 And a texture:
 
 ```c++
 // Assume the texture pixel data is loaded from and decoded elsewhere.
-auto textureDesc = nvrhi::TextureDesc()
-    .setDimension(nvrhi::TextureDimension::Texture2D)
+auto textureDesc = cutie::TextureDesc()
+    .setDimension(cutie::TextureDimension::Texture2D)
     .setWidth(textureWidth)
     .setHeight(textureHeight)
-    .setFormat(nvrhi::Format::SRGBA8_UNORM)
-    .enableAutomaticStateTracking(nvrhi::ResourceStates::ShaderResource)
+    .setFormat(cutie::Format::SRGBA8_UNORM)
+    .enableAutomaticStateTracking(cutie::ResourceStates::ShaderResource)
     .setDebugName("Geometry Texture");
 
-nvrhi::TextureHandle geometryTexture = nvrhiDevice->createTexture(textureDesc);
+cutie::TextureHandle geometryTexture = cutieDevice->createTexture(textureDesc);
 ```
 
 We'll also need a command list to upload the data and execute the rendering commands:
 
 ```c++
-nvrhi::CommandListHandle commandList = nvrhiDevice->createCommandList();
+cutie::CommandListHandle commandList = cutieDevice->createCommandList();
 ```
 
 Finally, we'll need a binding set to map our resources to the pipeline at draw time. Binding sets are basically mirror images of the binding layout but they reference actual resources to be bound.
@@ -236,11 +236,11 @@ Finally, we'll need a binding set to map our resources to the pipeline at draw t
 // Note: the binding set must include all bindings declared in the layout, and nothing else.
 // This condition is tested by the validation layer.
 // The order of items in the binding set doesn't matter.
-auto bindingSetDesc = nvrhi::BindingSetDesc()
-    .addItem(nvrhi::BindingSetItem::Texture_SRV(0, geometryTexture))
-    .addItem(nvrhi::BindingSetItem::ConstantBuffer(0, constantBuffer));
+auto bindingSetDesc = cutie::BindingSetDesc()
+    .addItem(cutie::BindingSetItem::Texture_SRV(0, geometryTexture))
+    .addItem(cutie::BindingSetItem::ConstantBuffer(0, constantBuffer));
 
-nvrhi::BindingSetHandle bindingSet = nvrhiDevice->createBindingSet(bindingSetDesc, bindingLayout);\
+cutie::BindingSetHandle bindingSet = cutieDevice->createBindingSet(bindingSetDesc, bindingLayout);\
 ```
 
 ### Filling the Resource Data
@@ -259,57 +259,57 @@ commandList->writeTexture(geometryTexture,
     textureData, textureRowPitch);
 
 commandList->close();
-nvrhiDevice->executeCommandList(commandList);
+cutieDevice->executeCommandList(commandList);
 ```
 
-Note that, unlike D3D12 or Vulkan, there is no need to allocate an upload buffer or issue copy commands. All of that is handled internally by NVRHI inside the `writeTexture` and `writeBuffer` functions. NVRHI contains an upload manager that maintains a pool of upload buffers and tracks their usage, so that chunks can be reused when the GPU has finished executing the command lists that reference them, and allocate new buffers when none are available. Of course, if more control over the upload process is desired, it is also possible to create a separate upload buffer or a staging texture, map them to the CPU, and perform an explicit copy operation.
+Note that, unlike D3D12 or Vulkan, there is no need to allocate an upload buffer or issue copy commands. All of that is handled internally by CUTIE inside the `writeTexture` and `writeBuffer` functions. CUTIE contains an upload manager that maintains a pool of upload buffers and tracks their usage, so that chunks can be reused when the GPU has finished executing the command lists that reference them, and allocate new buffers when none are available. Of course, if more control over the upload process is desired, it is also possible to create a separate upload buffer or a staging texture, map them to the CPU, and perform an explicit copy operation.
 
 ### Drawing the Geometry
 
 Now that all the objects are created and the resources are filled with data, we can implement the render function that runs on every frame.
 
 ```c++
-#include <nvrhi/utils.h> // for ClearColorAttachment
+#include <cutie/utils.h> // for ClearColorAttachment
 ...
 
 // Obtain the current framebuffer from the graphics API
-nvrhi::IFramebuffer* currentFramebuffer = ...;
+cutie::IFramebuffer* currentFramebuffer = ...;
 
 commandList->open();
 
 // Clear the primary render target
-nvrhi::utils::ClearColorAttachment(commandList, currentFramebuffer, 0, nvrhi::Color(0.f));
+cutie::utils::ClearColorAttachment(commandList, currentFramebuffer, 0, cutie::Color(0.f));
 
 // Fill the constant buffer
 float viewProjectionMatrix[16] = {...};
 commandList->writeBuffer(constantBuffer, viewProjectionMatrix, sizeof(viewProjectionMatrix));
 
 // Set the graphics state: pipeline, framebuffer, viewport, bindings.
-auto graphicsState = nvrhi::GraphicsState()
+auto graphicsState = cutie::GraphicsState()
     .setPipeline(graphicsPipeline)
     .setFramebuffer(currentFramebuffer)
-    .setViewport(nvrhi::ViewportState().addViewportAndScissorRect(nvrhi::Viewport(windowWidth, windowHeight)))
+    .setViewport(cutie::ViewportState().addViewportAndScissorRect(cutie::Viewport(windowWidth, windowHeight)))
     .addBindingSet(bindingSet)
     .addVertexBuffer(vertexBuffer);
 commandList->setGraphicsState(graphicsState);
 
 // Draw our geometry
-auto drawArguments = nvrhi::DrawArguments()
+auto drawArguments = cutie::DrawArguments()
     .setVertexCount(std::size(g_Vertices));
 commandList->draw(drawArguments);
 
 // Close and execute the command list
 commandList->close();
-nvrhiDevice->executeCommandList(commandList);
+cutieDevice->executeCommandList(commandList);
 ```
 
-Now we can present the rendered image to the screen. NVRHI does not provide any presentation functions, and that is left up to the application. Working presentation functions for all three GAPI can be found in the same `DeviceManager` classes in Donut, referenced above.
+Now we can present the rendered image to the screen. CUTIE does not provide any presentation functions, and that is left up to the application. Working presentation functions for all three GAPI can be found in the same `DeviceManager` classes in Donut, referenced above.
 
 A complete, working example application similar to the code shown above can be found in the [Donut Samples](https://github.com/NVIDIA-RTX/Donut-Samples) repository. Look for the `vertex_buffer` example.
 
 ## Ray Tracing Support
 
-NVRHI supports hardware accelerated ray tracing on both Vulkan and D3D12 through two major methods: ray tracing pipelines (`KHR_ray_tracing_pipeline` or DXR 1.0) and ray queries (`KHR_ray_query` or DXR 1.1 TraceRayInline). Both methods use the same acceleration structures (TLAS and BLAS).
+CUTIE supports hardware accelerated ray tracing on both Vulkan and D3D12 through two major methods: ray tracing pipelines (`KHR_ray_tracing_pipeline` or DXR 1.0) and ray queries (`KHR_ray_query` or DXR 1.1 TraceRayInline). Both methods use the same acceleration structures (TLAS and BLAS).
 
 Let's go through a basic example of building an acceleration structure and using a ray tracing pipeline to render something.
 
@@ -319,34 +319,34 @@ First, we need to create the acceleration structure objects. A minimal example i
 
 ```c++
 // Need to create the vertex buffer with extra flags
-auto vertexBufferDesc = nvrhi::BufferDesc()
+auto vertexBufferDesc = cutie::BufferDesc()
     // ...same parameters as before...
     .setCanHaveRawViews(true)          // we'll need to read the texture UV data in the shader
     .setIsAccelStructBuildInput(true); // we'll need to build the BLAS from the position data
 
-nvrhi::BufferHandle vertexBuffer = nvrhiDevice->createBuffer(vertexBufferDesc);
+cutie::BufferHandle vertexBuffer = cutieDevice->createBuffer(vertexBufferDesc);
 
 // Geometry descriptor
-auto triangles = nvrhi::rt::GeometryTriangles()
+auto triangles = cutie::rt::GeometryTriangles()
     .setVertexBuffer(vertexBuffer)
-    .setVertexFormat(nvrhi::Format::RGB32_FLOAT)
+    .setVertexFormat(cutie::Format::RGB32_FLOAT)
     .setVertexCount(std::size(g_Vertices))
     .setVertexStride(sizeof(Vertex));
 
 // BLAS descriptor
-auto blasDesc = nvrhi::rt::AccelStructDesc()
+auto blasDesc = cutie::rt::AccelStructDesc()
     .setDebugName("BLAS")
     .setIsTopLevel(false)
-    .addBottomLevelGeometry(nvrhi::rt::GeometryDesc().setTriangles(triangles));
+    .addBottomLevelGeometry(cutie::rt::GeometryDesc().setTriangles(triangles));
 
-nvrhi::rt::AccelStructHandle blas = nvrhiDevice->createAccelStruct(blasDesc);
+cutie::rt::AccelStructHandle blas = cutieDevice->createAccelStruct(blasDesc);
 
-auto tlasDesc = nvrhi::rt::AccelStructDesc()
+auto tlasDesc = cutie::rt::AccelStructDesc()
     .setDebugName("TLAS")
     .setIsTopLevel(true)
     .setTopLevelMaxInstances(1);
 
-nvrhi::rt::AccelStructHandle tlas = nvrhiDevice->createAccelStruct(tlasDesc);
+cutie::rt::AccelStructHandle tlas = cutieDevice->createAccelStruct(tlasDesc);
 ```
 
 When the AS objects are created, we can build them. If the geometry is static, they can be built just once, at startup.
@@ -360,20 +360,20 @@ commandList->writeBuffer(vertexBuffer, g_Vertices, sizeof(g_Vertices));
 // Build the BLAS using the geometry array populated earlier.
 // It's also possible to obtain the descriptor from the BLAS object using getDesc()
 // and write the vertex and index buffer references into that descriptor again
-// because NVRHI erases those when it creates the AS object.
+// because CUTIE erases those when it creates the AS object.
 commandList->buildBottomLevelAccelStruct(blas,
     blasDesc.geometries.data(), blasDesc.geometries.size());
 
 // Build the TLAS with one instance.
-auto instanceDesc = nvrhi::rt::InstanceDesc()
+auto instanceDesc = cutie::rt::InstanceDesc()
     .setBLAS(blas)
     .setFlags(1)
-    .setTransform(nvrhi::rt::c_IdentityTransform);
+    .setTransform(cutie::rt::c_IdentityTransform);
 
 commandList->buildTopLevelAccelStruct(tlas, &instanceDesc, 1);
 
 commandList->close();
-nvrhiDevice->executeCommandList(commandList);
+cutieDevice->executeCommandList(commandList);
 ```
 
 ### Ray Tracing Pipelines and Shader Tables
@@ -385,36 +385,36 @@ A ray tracing pipeline is based on at least one shader library, and includes mul
 ```c++
 const char g_ShaderLibrary[] = ...;
 
-nvrhi::ShaderLibraryHandle shaderLibrary = nvrhiDevice->createShaderLibrary(g_ShaderLibrary, sizeof(g_ShaderLibrary));
+cutie::ShaderLibraryHandle shaderLibrary = cutieDevice->createShaderLibrary(g_ShaderLibrary, sizeof(g_ShaderLibrary));
 
-auto layoutDesc = nvrhi::BindingLayoutDesc()
-    .setVisibility(nvrhi::ShaderType::All)
-    .addItem(nvrhi::BindingLayoutItem::Texture_SRV(0))             // texture at t0
-    .addItem(nvrhi::BindingLayoutItem::RawBuffer_SRV(1))           // vertex buffer at t1
-    .addItem(nvrhi::BindingLayoutItem::Texture_UAV(0))             // output texture at u0
-    .addItem(nvrhi::BindingLayoutItem::VolatileConstantBuffer(0)); // constants at b0
+auto layoutDesc = cutie::BindingLayoutDesc()
+    .setVisibility(cutie::ShaderType::All)
+    .addItem(cutie::BindingLayoutItem::Texture_SRV(0))             // texture at t0
+    .addItem(cutie::BindingLayoutItem::RawBuffer_SRV(1))           // vertex buffer at t1
+    .addItem(cutie::BindingLayoutItem::Texture_UAV(0))             // output texture at u0
+    .addItem(cutie::BindingLayoutItem::VolatileConstantBuffer(0)); // constants at b0
 
-nvrhi::BindingLayoutHandle bindingLayout = nvrhiDevice->createBindingLayout(layoutDesc);
+cutie::BindingLayoutHandle bindingLayout = cutieDevice->createBindingLayout(layoutDesc);
 
-auto pipelineDesc = nvrhi::rt::PipelineDesc()
+auto pipelineDesc = cutie::rt::PipelineDesc()
     .addBindingLayout(bindingLayout)
     .setMaxPayloadSize(sizeof(float) * 4)
-    .addShader(nvrhi::rt::PipelineShaderDesc().setShader(
-        shaderLibrary->getShader("RayGen", nvrhi::ShaderType::RayGeneration)))
-    .addShader(nvrhi::rt::PipelineShaderDesc().setShader(
-        shaderLibrary->getShader("Miss", nvrhi::ShaderType::Miss)))
-    .addHitGroup(nvrhi::rt::PipelineHitGroupDesc().setClosestHitShader(
-        shaderLibrary->getShader("ClosestHit", nvrhi::ShaderType::ClosestHit)));
+    .addShader(cutie::rt::PipelineShaderDesc().setShader(
+        shaderLibrary->getShader("RayGen", cutie::ShaderType::RayGeneration)))
+    .addShader(cutie::rt::PipelineShaderDesc().setShader(
+        shaderLibrary->getShader("Miss", cutie::ShaderType::Miss)))
+    .addHitGroup(cutie::rt::PipelineHitGroupDesc().setClosestHitShader(
+        shaderLibrary->getShader("ClosestHit", cutie::ShaderType::ClosestHit)));
 
-nvrhi::rt::PipelineHandle rtPipeline = nvrhiDevice->createRayTracingPipeline(pipelineDesc);
+cutie::rt::PipelineHandle rtPipeline = cutieDevice->createRayTracingPipeline(pipelineDesc);
 ```
 
 Note that each shader or hit group may include its own binding layout. These layouts map to local root signatures on D3D12, but they are not supported on Vulkan due to API constraints.
 
-In order to shoot some rays using this pipeline, we also need to create a shader table. NVRHI provides an easy to use abstraction over the GAPI shader tables that handles the buffer management and shader handle resolutions. Here's how a simple shader table can be created:
+In order to shoot some rays using this pipeline, we also need to create a shader table. CUTIE provides an easy to use abstraction over the GAPI shader tables that handles the buffer management and shader handle resolutions. Here's how a simple shader table can be created:
 
 ```c++
-nvrhi::ShaderTableHandle shaderTable = rtPipeline->createShaderTable();
+cutie::ShaderTableHandle shaderTable = rtPipeline->createShaderTable();
 shaderTable->setRayGenerationShader("RayGen");
 shaderTable->addHitGroup("HitGroup", /* localBindingSet = */ nullptr);
 shaderTable->addMissShader("Miss");
@@ -434,13 +434,13 @@ float viewProjectionMatrix[16] = {...};
 commandList->writeBuffer(constantBuffer, viewProjectionMatrix, sizeof(viewProjectionMatrix));
 
 // Set the pipeline, the shader table, and the global bindings
-auto rtState = nvrhi::rt::State()
+auto rtState = cutie::rt::State()
     .setShaderTable(shaderTable)
     .addBindingSet(bindingSet);
 commandList->setRayTracingState(rtState);
 
 // Dispatch the rays
-auto dispatchArguments = nvrhi::DispatchRaysArguments()
+auto dispatchArguments = cutie::DispatchRaysArguments()
     .setWidth(renderWidth)
     .setHeight(renderHeight);
 commandList->dispatchRays(dispatchArguments);
@@ -452,16 +452,16 @@ commandList->dispatchRays(dispatchArguments);
 // to sRGB space, for example. It's better to use a full screen quad for blitting.
 commandList->copyTexture(
     framebuffer->getDesc().colorAttachments[0].texture,
-    nvrhi::TextureSlice(),
+    cutie::TextureSlice(),
     outputTexture,
-    nvrhi::TextureSlice());
+    cutie::TextureSlice());
 
 commandList->close();
-nvrhiDevice->executeCommandList(commandList);
+cutieDevice->executeCommandList(commandList);
 ```
 
 ## Conclusion
 
-In this tutorial, we have shown basic usage of the NVRHI API to create some common rendering resources and pipelines and to draw geometry and trace rays. This does not cover the entire available API, of course, but should give you an idea of what it looks like.
+In this tutorial, we have shown basic usage of the CUTIE API to create some common rendering resources and pipelines and to draw geometry and trace rays. This does not cover the entire available API, of course, but should give you an idea of what it looks like.
 
-For more information, please refer to the [Programming Guide](ProgrammingGuide.md). To see working applications based on NVRHI, go to the [Donut Samples](https://github.com/NVIDIA-RTX/Donut-Samples) repository.
+For more information, please refer to the [Programming Guide](ProgrammingGuide.md). To see working applications based on CUTIE, go to the [Donut Samples](https://github.com/NVIDIA-RTX/Donut-Samples) repository.

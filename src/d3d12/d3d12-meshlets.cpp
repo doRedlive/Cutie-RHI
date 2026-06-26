@@ -22,10 +22,10 @@
 
 #include "d3d12-backend.h"
 
-#include <nvrhi/common/misc.h>
+#include <cutie/common/misc.h>
 #include <sstream>
 
-namespace nvrhi::d3d12
+namespace cutie::d3d12
 {
     Object MeshletPipeline::getNativeObject(ObjectType objectType)
     {
@@ -40,7 +40,7 @@ namespace nvrhi::d3d12
         }
     }
 
-    nvrhi::RefCountPtr<ID3D12PipelineState> Device::createPipelineState(const MeshletPipelineDesc& state, RootSignature* pRS, const FramebufferInfo& fbinfo) const
+    cutie::RefCountPtr<ID3D12PipelineState> Device::createPipelineState(const MeshletPipelineDesc& state, RootSignature* pRS, const FramebufferInfo& fbinfo) const
     {
         RefCountPtr<ID3D12PipelineState> pipelineState;
 
@@ -172,7 +172,7 @@ namespace nvrhi::d3d12
         return createMeshletPipeline(desc, fb->getFramebufferInfo());
     }
 
-	nvrhi::MeshletPipelineHandle Device::createHandleForNativeMeshletPipeline(IRootSignature* rootSignature, ID3D12PipelineState* pipelineState, const MeshletPipelineDesc& desc, const FramebufferInfo& framebufferInfo)
+	cutie::MeshletPipelineHandle Device::createHandleForNativeMeshletPipeline(IRootSignature* rootSignature, ID3D12PipelineState* pipelineState, const MeshletPipelineDesc& desc, const FramebufferInfo& framebufferInfo)
     {
         if (rootSignature == nullptr)
             return nullptr;
@@ -346,4 +346,4 @@ namespace nvrhi::d3d12
             countBuffer->resource,
             countOffsetBytes);
     }
-} // namespace nvrhi::d3d12
+} // namespace cutie::d3d12

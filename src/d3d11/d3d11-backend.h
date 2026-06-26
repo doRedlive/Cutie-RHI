@@ -22,30 +22,30 @@
 
 #pragma once
 
-#include <nvrhi/d3d11.h>
-#include <nvrhi/common/resourcebindingmap.h>
-#include <nvrhi/utils.h>
+#include <cutie/d3d11.h>
+#include <cutie/common/resourcebindingmap.h>
+#include <cutie/utils.h>
 #include "../common/dxgi-format.h"
 
 #include <d3d11_1.h>
 #include <map>
 #include <vector>
 
-#ifndef NVRHI_D3D11_WITH_NVAPI
-#define NVRHI_D3D11_WITH_NVAPI 0
+#ifndef CUTIE_D3D11_WITH_NVAPI
+#define CUTIE_D3D11_WITH_NVAPI 0
 #endif
 
-#if NVRHI_D3D11_WITH_NVAPI
+#if CUTIE_D3D11_WITH_NVAPI
 #include <nvapi.h>
 #include <nvShaderExtnEnums.h>
 #endif
 
-#include <nvrhi/common/aftermath.h>
-#if NVRHI_WITH_AFTERMATH
+#include <cutie/common/aftermath.h>
+#if CUTIE_WITH_AFTERMATH
 #include <GFSDK_Aftermath.h>
 #endif
 
-namespace nvrhi::d3d11
+namespace cutie::d3d11
 {
     void SetDebugName(ID3D11DeviceChild* pObject, const char* name);
 
@@ -65,7 +65,7 @@ namespace nvrhi::d3d11
         RefCountPtr<ID3D11Buffer> pushConstantBuffer;
         IMessageCallback* messageCallback = nullptr;
         bool nvapiAvailable = false;
-#if NVRHI_WITH_AFTERMATH
+#if CUTIE_WITH_AFTERMATH
         GFSDK_Aftermath_ContextHandle aftermathContext = nullptr;
 #endif
 
@@ -116,7 +116,7 @@ namespace nvrhi::d3d11
         
         Buffer(const Context& context) : m_Context(context) { }
         const BufferDesc& getDesc() const override { return desc; }
-        GpuVirtualAddress getGpuVirtualAddress() const override { nvrhi::utils::NotImplemented(); return 0; }
+        GpuVirtualAddress getGpuVirtualAddress() const override { cutie::utils::NotImplemented(); return 0; }
         Object getNativeObject(ObjectType objectType) override;
 
         ID3D11ShaderResourceView* getSRV(Format format, BufferRange range, ResourceType type);
@@ -342,7 +342,7 @@ namespace nvrhi::d3d11
         void compactBottomLevelAccelStructs() override;
         void copyRaytracingAccelerationStructure(rt::IAccelStruct* destination, rt::IAccelStruct* source) override;
         void buildTopLevelAccelStruct(rt::IAccelStruct* as, const rt::InstanceDesc* pInstances, size_t numInstances, rt::AccelStructBuildFlags buildFlags) override;
-        void buildTopLevelAccelStructFromBuffer(rt::IAccelStruct* as, nvrhi::IBuffer* instanceBuffer, uint64_t instanceBufferOffset, size_t numInstances,
+        void buildTopLevelAccelStructFromBuffer(rt::IAccelStruct* as, cutie::IBuffer* instanceBuffer, uint64_t instanceBufferOffset, size_t numInstances,
             rt::AccelStructBuildFlags buildFlags = rt::AccelStructBuildFlags::None) override;
         void executeMultiIndirectClusterOperation(const rt::cluster::OperationDesc& desc) override;
 
@@ -385,7 +385,7 @@ namespace nvrhi::d3d11
         CommandListParameters m_Desc;
 
         RefCountPtr<ID3DUserDefinedAnnotation> m_UserDefinedAnnotation;
-#if NVRHI_WITH_AFTERMATH
+#if CUTIE_WITH_AFTERMATH
         AftermathMarkerTracker m_AftermathTracker;
 #endif
 
@@ -563,4 +563,4 @@ namespace nvrhi::d3d11
         AftermathCrashDumpHelper m_AftermathCrashDumpHelper;
     };
 
-} // namespace nvrhi::d3d11
+} // namespace cutie::d3d11

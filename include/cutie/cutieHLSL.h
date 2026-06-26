@@ -20,8 +20,8 @@
 * DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef NVRHI_HLSL_H
-#define NVRHI_HLSL_H
+#ifndef CUTIE_HLSL_H
+#define CUTIE_HLSL_H
 
 // Cross-language static-assert. C++ uses standard `static_assert`. HLSL
 // support varies across DXC frontends: DXIL-DXC accepts `_Static_assert`,
@@ -29,14 +29,14 @@
 // unimplemented". Until both paths agree, gate the HLSL branch to a no-op
 // — C++ asserts are load-bearing (on-wire layout follows the C++ struct).
 #ifdef __cplusplus
-#define NVRHI_STATIC_ASSERT(cond, msg) static_assert(cond, msg)
+#define CUTIE_STATIC_ASSERT(cond, msg) static_assert(cond, msg)
 #else
-#define NVRHI_STATIC_ASSERT(cond, msg)
+#define CUTIE_STATIC_ASSERT(cond, msg)
 #endif
 
 // bit field defines
 #if defined(__cplusplus) || __HLSL_VERSION >= 2021 || __SLANG__
-namespace nvrhi
+namespace cutie
 {
     typedef uint64_t GpuVirtualAddress;
     struct GpuVirtualAddressAndStride
@@ -51,7 +51,7 @@ namespace nvrhi
         // Indirect Arg Structs that are shader friendly
         //////////////////////////////////////////////////////////////////////////
         
-        // Shader friendly equivalent of nvrhi::rt::InstanceDesc
+        // Shader friendly equivalent of cutie::rt::InstanceDesc
         struct IndirectInstanceDesc
         {
 #ifdef __cplusplus
@@ -99,7 +99,7 @@ namespace nvrhi
                 uint32_t reserved      : 5;
                 uint32_t geometryFlags : 3;  // ClusterGeometryFlags
             };
-            NVRHI_STATIC_ASSERT(sizeof(GeometryIndexAndFlags) == sizeof(uint32_t),
+            CUTIE_STATIC_ASSERT(sizeof(GeometryIndexAndFlags) == sizeof(uint32_t),
                                 "GeometryIndexAndFlags must pack into a single uint32 — "
                                 "the on-wire layout for NVAPI/Vulkan cluster builders, and "
                                 "for shader-side per-triangle arrays, depends on it.");
@@ -134,8 +134,8 @@ namespace nvrhi
                 uint32_t          triangleCount : 9;                 // The number of triangles used by the cluster template (max 256)
                 uint32_t          vertexCount : 9;                   // The number of vertices used by the cluster template (max 256)
                 uint32_t          positionTruncateBitCount : 6;      // The number of bits to truncate from the position values
-                uint32_t          indexFormat : 4;                   // The index format to use for the indexBuffer, must be one of nvrhi::rt::ClusteOperationIndexFormat
-                uint32_t          opacityMicromapIndexFormat : 4;    // The index format to use for the opacityMicromapIndexBuffer, see nvrhi::rt::ClusteOperationIndexFormat for possible values
+                uint32_t          indexFormat : 4;                   // The index format to use for the indexBuffer, must be one of cutie::rt::ClusteOperationIndexFormat
+                uint32_t          opacityMicromapIndexFormat : 4;    // The index format to use for the opacityMicromapIndexBuffer, see cutie::rt::ClusteOperationIndexFormat for possible values
                 GeometryIndexAndFlags baseGeometryIndexAndFlags;     // base geometry index (low 24 bits) + base geometry flags (bits 29-31, see ClusterGeometryFlags) — see geometryIndexAndFlagsBuffer
                 uint16_t          indexBufferStride;                 // The stride of the elements of indexBuffer, in bytes
                 uint16_t          vertexBufferStride;                // The stride of the elements of vertexBuffer, in bytes
@@ -167,7 +167,7 @@ namespace nvrhi
             };
         } // namespace cluster
     } // namespace rt
-} // namespace nvrhi
+} // namespace cutie
 
 #endif // __HLSL_VERSION 2021
 #endif

@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include <nvrhi/common/containers.h>
-#include <nvrhi/nvrhi.h>
+#include <cutie/common/containers.h>
+#include <cutie/cutie.h>
 #include <unordered_map>
 
-namespace nvrhi {
+namespace cutie {
 
 // describes a texture binding --- used to manage SRV / VkImageView per texture
 struct TextureBindingKey : public TextureSubresourceSet
@@ -78,26 +78,26 @@ struct BufferBindingKey : public BufferRange
     }
 };
 
-} // namespace nvrhi
+} // namespace cutie
 
 namespace std
 {
-    template<> struct hash<nvrhi::TextureBindingKey>
+    template<> struct hash<cutie::TextureBindingKey>
     {
-        std::size_t operator()(nvrhi::TextureBindingKey const& s) const noexcept
+        std::size_t operator()(cutie::TextureBindingKey const& s) const noexcept
         {
-            return std::hash<nvrhi::Format>()(s.format)
-                ^ std::hash<nvrhi::TextureSubresourceSet>()(s)
+            return std::hash<cutie::Format>()(s.format)
+                ^ std::hash<cutie::TextureSubresourceSet>()(s)
                 ^ std::hash<bool>()(s.isReadOnlyDSV);
         }
     };
 
-    template<> struct hash<nvrhi::BufferBindingKey>
+    template<> struct hash<cutie::BufferBindingKey>
     {
-        std::size_t operator()(nvrhi::BufferBindingKey const& s) const noexcept
+        std::size_t operator()(cutie::BufferBindingKey const& s) const noexcept
         {
-            return std::hash<nvrhi::Format>()(s.format)
-                ^ std::hash<nvrhi::BufferRange>()(s);
+            return std::hash<cutie::Format>()(s.format)
+                ^ std::hash<cutie::BufferRange>()(s);
         }
     };
 }

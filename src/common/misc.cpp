@@ -20,11 +20,11 @@
 * DEALINGS IN THE SOFTWARE.
 */
 
-#include <nvrhi/nvrhi.h>
-#include <nvrhi/utils.h>
+#include <cutie/cutie.h>
+#include <cutie/utils.h>
 #include <cmath>
 
-namespace nvrhi
+namespace cutie
 {
     // Do not move this function into the header.
     bool verifyHeaderVersion(uint32_t version)
@@ -203,7 +203,7 @@ namespace nvrhi
         if (desc.shadingRateAttachment.valid())
         {
             setTextureState(desc.shadingRateAttachment.texture, desc.shadingRateAttachment.subresources,
-                nvrhi::ResourceStates::ShadingRateSurface);
+                cutie::ResourceStates::ShadingRateSurface);
         }
     }
     
@@ -261,4 +261,4 @@ namespace nvrhi
         }
     }
 
-} // namespace nvrhi
+} // namespace cutie

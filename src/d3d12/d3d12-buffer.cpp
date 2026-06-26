@@ -22,13 +22,13 @@
 
 
 #include "d3d12-backend.h"
-#include <nvrhi/utils.h>
-#include <nvrhi/common/misc.h>
+#include <cutie/utils.h>
+#include <cutie/common/misc.h>
 
 #include <sstream>
 #include <iomanip>
 
-namespace nvrhi::d3d12
+namespace cutie::d3d12
 {
     Object Buffer::getNativeObject(ObjectType objectType)
     {
@@ -213,7 +213,7 @@ namespace nvrhi::d3d12
         {
             std::wstring wname(desc.debugName.begin(), desc.debugName.end());
             resource->SetName(wname.c_str());
-#if NVRHI_WITH_AFTERMATH
+#if CUTIE_WITH_AFTERMATH
             // the driver will track the resource internally so don't need to keep the handle around
             GFSDK_Aftermath_ResourceHandle resourceHandle = {};
             GFSDK_Aftermath_DX12_RegisterResource(resource, &resourceHandle);
@@ -391,7 +391,7 @@ namespace nvrhi::d3d12
         return true;
     }
 
-    nvrhi::BufferHandle Device::createHandleForNativeBuffer(ObjectType objectType, Object _buffer, const BufferDesc& desc)
+    cutie::BufferHandle Device::createHandleForNativeBuffer(ObjectType objectType, Object _buffer, const BufferDesc& desc)
     {
         if (_buffer.pointer == nullptr)
             return nullptr;
@@ -647,4 +647,4 @@ namespace nvrhi::d3d12
         m_ActiveCommandList->commandList->CopyBufferRegion(dest->resource, destOffsetBytes, src->resource, srcOffsetBytes, dataSizeBytes);
     }
 
-} // namespace nvrhi::d3d12
+} // namespace cutie::d3d12

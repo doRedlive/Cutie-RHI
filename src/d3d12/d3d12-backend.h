@@ -22,71 +22,71 @@
 
 #pragma once
 
-#include <nvrhi/d3d12.h>
+#include <cutie/d3d12.h>
 
-#ifndef NVRHI_D3D12_WITH_NVAPI
-#define NVRHI_D3D12_WITH_NVAPI 0
+#ifndef CUTIE_D3D12_WITH_NVAPI
+#define CUTIE_D3D12_WITH_NVAPI 0
 #endif
 
-#if NVRHI_D3D12_WITH_NVAPI
+#if CUTIE_D3D12_WITH_NVAPI
 #include <dxgi.h>
 #include <nvapi.h>
 #endif
 
-#include <nvrhi/common/aftermath.h>
-#if NVRHI_WITH_AFTERMATH
+#include <cutie/common/aftermath.h>
+#if CUTIE_WITH_AFTERMATH
 #include <GFSDK_Aftermath.h>
 #endif
 
 // If using the Agility SDK version of OMM, ignore the NVAPI version
-#if NVRHI_D3D12_WITH_DXR12_OPACITY_MICROMAP
-    #define NVRHI_WITH_NVAPI_OPACITY_MICROMAP (0)
+#if CUTIE_D3D12_WITH_DXR12_OPACITY_MICROMAP
+    #define CUTIE_WITH_NVAPI_OPACITY_MICROMAP (0)
 #else
     // There's no version check available in the nvapi header,
     // instead to check if the NvAPI linked is OMM compatible version (>520) we look for one of the defines it adds...
-    #if NVRHI_D3D12_WITH_NVAPI && defined(NVAPI_GET_RAYTRACING_OPACITY_MICROMAP_ARRAY_PREBUILD_INFO_PARAMS_VER)
-        #define NVRHI_WITH_NVAPI_OPACITY_MICROMAP (1)
+    #if CUTIE_D3D12_WITH_NVAPI && defined(NVAPI_GET_RAYTRACING_OPACITY_MICROMAP_ARRAY_PREBUILD_INFO_PARAMS_VER)
+        #define CUTIE_WITH_NVAPI_OPACITY_MICROMAP (1)
     #else
-        #define NVRHI_WITH_NVAPI_OPACITY_MICROMAP (0)
+        #define CUTIE_WITH_NVAPI_OPACITY_MICROMAP (0)
     #endif
 #endif
 
 // ... same for DMM compatible versions (>=535) we look for one of the defines it adds
-#if NVRHI_D3D12_WITH_NVAPI && defined(NVAPI_GET_RAYTRACING_DISPLACEMENT_MICROMAP_ARRAY_PREBUILD_INFO_PARAMS_VER)
-#define NVRHI_WITH_NVAPI_DISPLACEMENT_MICROMAP (1)
+#if CUTIE_D3D12_WITH_NVAPI && defined(NVAPI_GET_RAYTRACING_DISPLACEMENT_MICROMAP_ARRAY_PREBUILD_INFO_PARAMS_VER)
+#define CUTIE_WITH_NVAPI_DISPLACEMENT_MICROMAP (1)
 #else
-#define NVRHI_WITH_NVAPI_DISPLACEMENT_MICROMAP (0)
+#define CUTIE_WITH_NVAPI_DISPLACEMENT_MICROMAP (0)
 #endif
 
-#if NVRHI_D3D12_WITH_NVAPI && defined(NVAPI_GET_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_REQUIREMENTS_INFO_PARAMS_VER)
-#define NVRHI_WITH_NVAPI_CLUSTERS (1)
+#if CUTIE_D3D12_WITH_NVAPI && defined(NVAPI_GET_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_REQUIREMENTS_INFO_PARAMS_VER)
+#define CUTIE_WITH_NVAPI_CLUSTERS (1)
 #else
-#define NVRHI_WITH_NVAPI_CLUSTERS (0)
+#define CUTIE_WITH_NVAPI_CLUSTERS (0)
 #endif
 
 // Line-Swept Spheres were added in NVAPI SDK 572.18
-#if NVRHI_D3D12_WITH_NVAPI && !NVRHI_D3D12_WITH_DXR12_OPACITY_MICROMAP && (NVAPI_SDK_VERSION >= 57218)
-#define NVRHI_WITH_NVAPI_LSS (1)
+#if CUTIE_D3D12_WITH_NVAPI && !CUTIE_D3D12_WITH_DXR12_OPACITY_MICROMAP && (NVAPI_SDK_VERSION >= 57218)
+#define CUTIE_WITH_NVAPI_LSS (1)
 #else
-#define NVRHI_WITH_NVAPI_LSS (0)
+#define CUTIE_WITH_NVAPI_LSS (0)
 #endif
 
 // Preview 717 exposes cooperative-vector feature queries (D3D12_FEATURE_COOPERATIVE_VECTOR).
 // Preview 720+ uses the Linear Algebra feature tier and matrix-operation queries when DIRECT3D_LINEAR_ALGEBRA is defined.
 #if (D3D12_PREVIEW_SDK_VERSION == 717) || (defined(DIRECT3D_LINEAR_ALGEBRA) && D3D12_PREVIEW_SDK_VERSION >= 720)
-#define NVRHI_D3D12_WITH_COOP_VECTOR_COMMON (1)
+#define CUTIE_D3D12_WITH_COOP_VECTOR_COMMON (1)
 #else
-#define NVRHI_D3D12_WITH_COOP_VECTOR_COMMON (0)
+#define CUTIE_D3D12_WITH_COOP_VECTOR_COMMON (0)
 #endif
 
 #if defined(DIRECT3D_LINEAR_ALGEBRA) && D3D12_PREVIEW_SDK_VERSION >= 720
-#define NVRHI_D3D12_WITH_LINALG (1)
+#define CUTIE_D3D12_WITH_LINALG (1)
 #else
-#define NVRHI_D3D12_WITH_LINALG (0)
+#define CUTIE_D3D12_WITH_LINALG (0)
 #endif
 
-// Deprecated: downstream code should use NVRHI_D3D12_WITH_COOP_VECTOR_COMMON; alias will be removed after a deprecation window.
-#define NVRHI_D3D12_WITH_COOPVEC NVRHI_D3D12_WITH_COOP_VECTOR_COMMON
+// Deprecated: downstream code should use CUTIE_D3D12_WITH_COOP_VECTOR_COMMON; alias will be removed after a deprecation window.
+#define CUTIE_D3D12_WITH_COOPVEC CUTIE_D3D12_WITH_COOP_VECTOR_COMMON
 
 #include <bitset>
 #include <memory>
@@ -96,17 +96,17 @@
 #include <unordered_map>
 #include <utility>
 
-#include <nvrhi/common/resourcebindingmap.h>
-#include <nvrhi/utils.h>
+#include <cutie/common/resourcebindingmap.h>
+#include <cutie/utils.h>
 #include "../common/state-tracking.h"
 #include "../common/dxgi-format.h"
 #include "../common/versioning.h"
 
-#ifdef NVRHI_WITH_RTXMU
+#ifdef CUTIE_WITH_RTXMU
 #include <rtxmu/D3D12AccelStructManager.h>
 #endif
 
-namespace nvrhi::d3d12
+namespace cutie::d3d12
 {
     class RootSignature;
     class Buffer;
@@ -131,7 +131,7 @@ namespace nvrhi::d3d12
     UINT convertSamplerReductionType(SamplerReductionType reductionType);
     D3D12_SHADING_RATE convertPixelShadingRate(VariableShadingRate shadingRate);
     D3D12_SHADING_RATE_COMBINER convertShadingRateCombiner(ShadingRateCombiner combiner);
-#if NVRHI_D3D12_WITH_COOP_VECTOR_COMMON
+#if CUTIE_D3D12_WITH_COOP_VECTOR_COMMON
     D3D12_LINEAR_ALGEBRA_DATATYPE convertCoopVecDataType(coopvec::DataType type);
     coopvec::DataType convertCoopVecDataType(D3D12_LINEAR_ALGEBRA_DATATYPE type);
     D3D12_LINEAR_ALGEBRA_MATRIX_LAYOUT convertCoopVecMatrixLayout(coopvec::MatrixLayout layout);
@@ -150,10 +150,10 @@ namespace nvrhi::d3d12
         RefCountPtr<ID3D12Device5> device5;
         RefCountPtr<ID3D12Device8> device8;
         RefCountPtr<ID3D12Device10> device10;
-#if NVRHI_D3D12_WITH_COOP_VECTOR_COMMON
+#if CUTIE_D3D12_WITH_COOP_VECTOR_COMMON
         RefCountPtr<ID3D12DevicePreview> devicePreview;
 #endif
-#ifdef NVRHI_WITH_RTXMU
+#ifdef CUTIE_WITH_RTXMU
         std::unique_ptr<rtxmu::DxAccelStructManager> rtxMemUtil;
 #endif
 
@@ -214,7 +214,7 @@ namespace nvrhi::d3d12
         StaticDescriptorHeap shaderResourceViewHeap;
         StaticDescriptorHeap samplerHeap;
         utils::BitSetAllocator timerQueries;
-#ifdef NVRHI_WITH_RTXMU
+#ifdef CUTIE_WITH_RTXMU
         std::mutex asListMutex;
         std::vector<uint64_t> asBuildsCompleted;
 #endif
@@ -237,7 +237,7 @@ namespace nvrhi::d3d12
     public:
         ShaderDesc desc;
         std::vector<char> bytecode;
-    #if NVRHI_D3D12_WITH_NVAPI
+    #if CUTIE_D3D12_WITH_NVAPI
         std::vector<NVAPI_D3D12_PSO_EXTENSION_DESC*> extensions;
         std::vector<NV_CUSTOM_SEMANTIC> customSemantics;
         std::vector<uint32_t> coordinateSwizzling;
@@ -727,7 +727,7 @@ namespace nvrhi::d3d12
     
     struct EnhancedResourceStateMapping
     {
-        ResourceStates nvrhiState;
+        ResourceStates cutieState;
         D3D12_BARRIER_SYNC sync;
         D3D12_BARRIER_ACCESS access;
         D3D12_BARRIER_LAYOUT layout;
@@ -803,7 +803,7 @@ namespace nvrhi::d3d12
         bool allowUpdate = false;
         bool compacted = false;
         size_t rtxmuId = ~0ull;
-#ifdef NVRHI_WITH_RTXMU
+#ifdef CUTIE_WITH_RTXMU
         D3D12_GPU_VIRTUAL_ADDRESS rtxmuGpuVA = 0;
 #endif
 
@@ -968,11 +968,11 @@ namespace nvrhi::d3d12
         RefCountPtr<ID3D12GraphicsCommandList4> commandList4;
         RefCountPtr<ID3D12GraphicsCommandList6> commandList6;
         RefCountPtr<ID3D12GraphicsCommandList7> commandList7;
-#if NVRHI_D3D12_WITH_COOP_VECTOR_COMMON
+#if CUTIE_D3D12_WITH_COOP_VECTOR_COMMON
         RefCountPtr<ID3D12GraphicsCommandListPreview> commandListPreview;
 #endif
         uint64_t lastSubmittedInstance = 0;
-#if NVRHI_WITH_AFTERMATH
+#if CUTIE_WITH_AFTERMATH
         GFSDK_Aftermath_ContextHandle aftermathContext;
 #endif
     };
@@ -990,13 +990,13 @@ namespace nvrhi::d3d12
         std::vector<RefCountPtr<StagingTexture>> referencedStagingTextures;
         std::vector<RefCountPtr<Buffer>> referencedStagingBuffers;
         std::vector<RefCountPtr<TimerQuery>> referencedTimerQueries;
-#ifdef NVRHI_WITH_RTXMU
+#ifdef CUTIE_WITH_RTXMU
         std::vector<uint64_t> rtxmuBuildIds;
         std::vector<uint64_t> rtxmuCompactionIds;
 #endif
     };
 
-    class CommandList final : public RefCounter<nvrhi::d3d12::ICommandList>
+    class CommandList final : public RefCounter<cutie::d3d12::ICommandList>
     {
     public:
 
@@ -1063,7 +1063,7 @@ namespace nvrhi::d3d12
         void compactBottomLevelAccelStructs() override;
         void copyRaytracingAccelerationStructure(rt::IAccelStruct* destination, rt::IAccelStruct* source) override;
         void buildTopLevelAccelStruct(rt::IAccelStruct* as, const rt::InstanceDesc* pInstances, size_t numInstances, rt::AccelStructBuildFlags buildFlags) override;
-        void buildTopLevelAccelStructFromBuffer(rt::IAccelStruct* as, nvrhi::IBuffer* instanceBuffer, uint64_t instanceBufferOffset, size_t numInstances,
+        void buildTopLevelAccelStructFromBuffer(rt::IAccelStruct* as, cutie::IBuffer* instanceBuffer, uint64_t instanceBufferOffset, size_t numInstances,
             rt::AccelStructBuildFlags buildFlags = rt::AccelStructBuildFlags::None) override;
         void executeMultiIndirectClusterOperation(const rt::cluster::OperationDesc& desc) override;
 
@@ -1096,7 +1096,7 @@ namespace nvrhi::d3d12
         ResourceStates getTextureSubresourceState(ITexture* texture, ArraySlice arraySlice, MipLevel mipLevel) override;
         ResourceStates getBufferState(IBuffer* buffer) override;
 
-        nvrhi::IDevice* getDevice() override;
+        cutie::IDevice* getDevice() override;
         const CommandListParameters& getDesc() override { return m_Desc; }
 
         // D3D12 specific methods
@@ -1150,7 +1150,7 @@ namespace nvrhi::d3d12
         std::list<std::shared_ptr<InternalCommandList>> m_CommandListPool;
         std::shared_ptr<CommandListInstance> m_Instance;
         uint64_t m_RecordingVersion = 0;
-#if NVRHI_WITH_AFTERMATH
+#if CUTIE_WITH_AFTERMATH
         AftermathMarkerTracker m_AftermathTracker;
 #endif
 
@@ -1291,8 +1291,8 @@ namespace nvrhi::d3d12
 
         bool bindAccelStructMemory(rt::IAccelStruct* as, IHeap* heap, uint64_t offset) override;
 
-        nvrhi::CommandListHandle createCommandList(const CommandListParameters& params = CommandListParameters()) override;
-        uint64_t executeCommandLists(nvrhi::ICommandList* const* pCommandLists, size_t numCommandLists, CommandQueue executionQueue = CommandQueue::Graphics) override;
+        cutie::CommandListHandle createCommandList(const CommandListParameters& params = CommandListParameters()) override;
+        uint64_t executeCommandLists(cutie::ICommandList* const* pCommandLists, size_t numCommandLists, CommandQueue executionQueue = CommandQueue::Graphics) override;
         void queueWaitForCommandList(CommandQueue waitQueue, CommandQueue executionQueue, uint64_t instance) override;
         bool waitForIdle() override;
         CommandListLifetimeTrackerHandle createCommandListLifetimeTracker(CommandQueue executionQueue) override;
@@ -1357,7 +1357,7 @@ namespace nvrhi::d3d12
         bool m_RayTracingValidationEnabled = false;
         void* m_RayTracingValidationCallbackHandle = nullptr;
         bool m_HeapDirectlyIndexedEnabled = false;
-#if NVRHI_D3D12_WITH_LINALG
+#if CUTIE_D3D12_WITH_LINALG
         bool m_LinearAlgebraSupported = false;
 #else
         bool m_CoopVecInferencingSupported = false;
@@ -1380,4 +1380,4 @@ namespace nvrhi::d3d12
     
     };
 
-} // namespace nvrhi::d3d12
+} // namespace cutie::d3d12

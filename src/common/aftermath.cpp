@@ -20,9 +20,9 @@
 * DEALINGS IN THE SOFTWARE.
 */
 
-#include <nvrhi/common/aftermath.h>
+#include <cutie/common/aftermath.h>
 
-namespace nvrhi
+namespace cutie
 {
     AftermathMarkerTracker::AftermathMarkerTracker() :
         m_EventStack{},
@@ -135,4 +135,4 @@ namespace nvrhi
 
 
 
-} // namespace nvrhi
+} // namespace cutie

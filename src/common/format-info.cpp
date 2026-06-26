@@ -20,9 +20,9 @@
 * DEALINGS IN THE SOFTWARE.
 */
 
-#include <nvrhi/nvrhi.h>
+#include <cutie/cutie.h>
 
-namespace nvrhi
+namespace cutie
 {
     // Format mapping table. The rows must be in the exactly same order as Format enum members are defined.
     static const FormatInfo c_FormatInfo[] = {
@@ -112,4 +112,4 @@ namespace nvrhi
         return info;
     }
 
-} // namespace nvrhi::d3d11
+} // namespace cutie::d3d11
